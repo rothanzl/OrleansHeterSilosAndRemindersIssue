@@ -30,4 +30,6 @@ var app = builder.Build();
 
 app.MapGet("/", () => Results.Ok("Silo"));
 
+throw new ApplicationException("This is test exception");
+
 app.Run();
