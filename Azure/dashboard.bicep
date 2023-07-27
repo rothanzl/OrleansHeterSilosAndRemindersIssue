@@ -43,6 +43,10 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
           image: repositoryImage
           name: name
           env: envVars
+          resources:{
+            cpu: json('.1')
+            memory: '100Mb'
+          }
         }
       ]
       scale: {
