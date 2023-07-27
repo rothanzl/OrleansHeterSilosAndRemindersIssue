@@ -28,6 +28,10 @@ env:
   SCALER_DOCKER_FILE_PATH: Scaler/Dockerfile
   SCALER_IMAGE_NAME: scaler
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   provision:
     runs-on: ubuntu-latest
