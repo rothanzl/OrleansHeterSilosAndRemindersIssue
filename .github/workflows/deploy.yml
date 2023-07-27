@@ -8,10 +8,10 @@ on:
 env:
   
   # alphanumeric string under 14 characters
-  RESOURCE_GROUP_NAME: orleans-cluster-on-container-apps
+  RESOURCE_GROUP_NAME: zbox-perf-tests-non-prod
 
   # specify your preferred region
-  REGION: eastus
+  REGION: westeurope
 
   SILO_DOCKER_FILE_PATH: Silo/Dockerfile
   SILO_IMAGE_NAME: silo
