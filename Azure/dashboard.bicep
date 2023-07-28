@@ -44,7 +44,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
           name: name
           env: envVars
           resources:{
-            cpu: json('.1')
+            cpu: json('.25')
             memory: '0.5Gi'
           }
         }
