@@ -25,6 +25,14 @@ module storage 'storage.bicep' = {
   }
 }
 
+module cosmosdb 'cosmosdb.bicep' = {
+  name: toLower('sql-${uniqueString(resourceGroup().id)}')
+  params: {
+    location: location
+    primaryRegion: location
+  }
+}
+
 var shared_config = [
   {
     name: 'ASPNETCORE_ENVIRONMENT'
@@ -41,6 +49,15 @@ var shared_config = [
   {
     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
     value: env.outputs.appInsightsConnectionString
+  }
+  {
+    name: 'CosmosDb'
+    value: {
+      storageName: cosmosdb.outputs.storageName
+      accountKey: cosmosdb.outputs.accountKey
+      connectionString: cosmosdb.outputs.connectionString
+      connectionString2: cosmosdb.outputs.connectionString2
+    }
   }
 ]
 
