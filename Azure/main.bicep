@@ -52,12 +52,7 @@ var shared_config = [
   }
   {
     name: 'CosmosDb'
-    value: {
-      storageName: cosmosdb.outputs.storageName
-      // accountKey: cosmosdb.outputs.accountKey
-      connectionString: cosmosdb.outputs.connectionString
-      connectionString2: cosmosdb.outputs.connectionString2
-    }
+    value: cosmosdb.outputs.connectionString
   }
 ]
 

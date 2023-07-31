@@ -8,7 +8,7 @@ on:
 env:
   
   # alphanumeric string under 14 characters
-  RESOURCE_GROUP_NAME: zbox-perf-006
+  RESOURCE_GROUP_NAME: zbox-perf-007
 
   # specify your preferred region
   REGION: westeurope
