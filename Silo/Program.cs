@@ -50,7 +50,7 @@ builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddWebAppApplicationInsights("Silo");
 
 // uncomment this if you dont mind hosting grains in the dashboard
-// builder.Services.DontHostGrainsHere();
+builder.Services.DontHostGrainsHere();
 
 var app = builder.Build();
 app.MapControllers();
