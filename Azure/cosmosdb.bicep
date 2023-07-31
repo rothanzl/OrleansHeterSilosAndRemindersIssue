@@ -168,12 +168,8 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
   }
 }
 
-
-// var key = listKeys(account.name, account.apiVersion).keys[0].value
-
+output key string = account.listKeys().primaryMasterKey
 
 output connectionString string = account.listConnectionStrings().connectionStrings[0].connectionString
-output connectionString2 object = account.listConnectionStrings().connectionStrings[0]
-
+output uri string = account.properties.keyVaultKeyUri
 output storageName string = account.name
-// output accountKey string = key

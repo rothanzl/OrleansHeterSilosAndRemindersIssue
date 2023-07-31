@@ -51,8 +51,16 @@ var shared_config = [
     value: env.outputs.appInsightsConnectionString
   }
   {
-    name: 'CosmosDb'
+    name: 'CosmosDbConnectionString'
     value: cosmosdb.outputs.connectionString
+  }
+  {
+    name: 'CosmosDbUri'
+    value: cosmosdb.outputs.uri
+  }
+  {
+    name: 'CosmosDbKey'
+    value: cosmosdb.outputs.key
   }
 ]
 
