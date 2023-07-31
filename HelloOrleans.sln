@@ -36,6 +36,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bicep", "Bicep", "{FB9AF459
 		Azure\workerserviceclient.bicep = Azure\workerserviceclient.bicep
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{5CD2B06A-7E39-495A-9D55-6D25574B920C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Orleans", "Common.Orleans\Common.Orleans.csproj", "{B7F6C47E-582E-4726-BE7A-4D8E162C93F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,12 +78,17 @@ Global
 		{46FE3569-9F01-4883-9A47-FFA7F17C7835}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46FE3569-9F01-4883-9A47-FFA7F17C7835}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46FE3569-9F01-4883-9A47-FFA7F17C7835}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7F6C47E-582E-4726-BE7A-4D8E162C93F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7F6C47E-582E-4726-BE7A-4D8E162C93F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7F6C47E-582E-4726-BE7A-4D8E162C93F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7F6C47E-582E-4726-BE7A-4D8E162C93F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FB9AF459-6C74-4A6F-95F6-ADC65F1B00D5} = {5D6267A9-46FB-457D-8BFE-FBEC0CE869A3}
+		{B7F6C47E-582E-4726-BE7A-4D8E162C93F4} = {5CD2B06A-7E39-495A-9D55-6D25574B920C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7EAD99FB-C478-4BB6-B652-0075D55BF04E}

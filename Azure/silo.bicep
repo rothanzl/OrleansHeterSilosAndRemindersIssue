@@ -40,24 +40,24 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
           env: envVars
         }
       ]
-      scale: {
-        minReplicas: minReplicas
-        maxReplicas: maxReplicas
-        rules: [
-          {
-            name: 'scaler'
-            custom: {
-              type: 'external'
-              metadata: {
-                scalerAddress: '${scalerUrl}:80'
-                graintype: 'sensortwin'
-                siloNameFilter: 'silo'
-                upperbound: '300'
-              }
-            }
-          }
-        ]
-      }
+      // scale: {
+      //   minReplicas: minReplicas
+      //   maxReplicas: maxReplicas
+      //   rules: [
+      //     {
+      //       name: 'scaler'
+      //       custom: {
+      //         type: 'external'
+      //         metadata: {
+      //           scalerAddress: '${scalerUrl}:80'
+      //           graintype: 'sensortwin'
+      //           siloNameFilter: 'silo'
+      //           upperbound: '300'
+      //         }
+      //       }
+      //     }
+      //   ]
+      // }
     }
   }
 }
