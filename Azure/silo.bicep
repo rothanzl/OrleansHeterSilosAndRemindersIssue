@@ -7,7 +7,7 @@ param registry string
 param registryUsername string
 param minReplicas int = 1
 param maxReplicas int = 10
-param scalerUrl string
+// param scalerUrl string
 param allowExternalIngress bool = false
 param targetIngressPort int = 80
 @secure()

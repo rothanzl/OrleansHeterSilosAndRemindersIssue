@@ -18,12 +18,12 @@ module env 'environment.bicep' = {
   }
 }
 
-module storage 'storage.bicep' = {
-  name: toLower('${uniqueString(resourceGroup().id)}strg')
-  params: {
-    location: location
-  }
-}
+// module storage 'storage.bicep' = {
+//   name: toLower('${uniqueString(resourceGroup().id)}strg')
+//   params: {
+//     location: location
+//   }
+// }
 
 module cosmosdb 'cosmosdb.bicep' = {
   name: toLower('sql-${uniqueString(resourceGroup().id)}')
@@ -38,10 +38,10 @@ var shared_config = [
     name: 'ASPNETCORE_ENVIRONMENT'
     value: 'Development'
   }
-  {
-    name: 'StorageConnectionString'
-    value: format('DefaultEndpointsProtocol=https;AccountName=${storage.outputs.storageName};AccountKey=${storage.outputs.accountKey};EndpointSuffix=core.windows.net')
-  }
+  // {
+  //   name: 'StorageConnectionString'
+  //   value: format('DefaultEndpointsProtocol=https;AccountName=${storage.outputs.storageName};AccountKey=${storage.outputs.accountKey};EndpointSuffix=core.windows.net')
+  // }
   {
     name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
     value: env.outputs.appInsightsInstrumentationKey
@@ -64,18 +64,18 @@ var shared_config = [
   }
 ]
 
-module scaler 'scaler.bicep' = {
-  name: 'scaler'
-  params: {
-    location: location
-    name: 'scaler'
-    containerAppEnvironmentId: env.outputs.id
-    registry: acr.name
-    registryPassword: acr.listCredentials().passwords[0].value
-    registryUsername: acr.listCredentials().username
-    envVars : shared_config
-  }
-}
+// module scaler 'scaler.bicep' = {
+//   name: 'scaler'
+//   params: {
+//     location: location
+//     name: 'scaler'
+//     containerAppEnvironmentId: env.outputs.id
+//     registry: acr.name
+//     registryPassword: acr.listCredentials().passwords[0].value
+//     registryUsername: acr.listCredentials().username
+//     envVars : shared_config
+//   }
+// }
 
 module silo 'silo.bicep' = {
   name: 'silo'
@@ -89,7 +89,7 @@ module silo 'silo.bicep' = {
     allowExternalIngress: true
     targetIngressPort: 80
     envVars : shared_config
-    scalerUrl: scaler.outputs.fqdn
+    // scalerUrl: scaler.outputs.fqdn
   }
 }
 
@@ -125,18 +125,18 @@ module minimalapiclient 'minimalapiclient.bicep' = {
   }
 }
 
-module workerserviceclient 'workerserviceclient.bicep' = {
-  name: 'workerserviceclient'
-  params: {
-    location: location
-    name: 'workerserviceclient'
-    containerAppEnvironmentId: env.outputs.id
-    registry: acr.name
-    registryPassword: acr.listCredentials().passwords[0].value
-    registryUsername: acr.listCredentials().username
-    maxReplicas: 1
-    envVars : shared_config
-  }
-}
+// module workerserviceclient 'workerserviceclient.bicep' = {
+//   name: 'workerserviceclient'
+//   params: {
+//     location: location
+//     name: 'workerserviceclient'
+//     containerAppEnvironmentId: env.outputs.id
+//     registry: acr.name
+//     registryPassword: acr.listCredentials().passwords[0].value
+//     registryUsername: acr.listCredentials().username
+//     maxReplicas: 1
+//     envVars : shared_config
+//   }
+// }
 
 output acrLoginServer string = acr.properties.loginServer

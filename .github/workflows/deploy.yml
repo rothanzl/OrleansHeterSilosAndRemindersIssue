@@ -22,11 +22,11 @@ env:
   MINIMAL_CLIENT_DOCKER_FILE_PATH: Clients.MinimalApi/Dockerfile
   MINIMAL_CLIENT_IMAGE_NAME: minimalapiclient
 
-  WORKERSERVICE_CLIENT_DOCKER_FILE_PATH: Clients.WorkerService/Dockerfile
-  WORKERSERVICE_CLIENT_IMAGE_NAME: workerserviceclient
+  # WORKERSERVICE_CLIENT_DOCKER_FILE_PATH: Clients.WorkerService/Dockerfile
+  # WORKERSERVICE_CLIENT_IMAGE_NAME: workerserviceclient
 
-  SCALER_DOCKER_FILE_PATH: Scaler/Dockerfile
-  SCALER_IMAGE_NAME: scaler
+  # SCALER_DOCKER_FILE_PATH: Scaler/Dockerfile
+  # SCALER_IMAGE_NAME: scaler
 
 permissions:
   id-token: write
@@ -123,19 +123,19 @@ jobs:
         tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.MINIMAL_CLIENT_IMAGE_NAME }}:${{ github.sha }}
         file: ${{ env.MINIMAL_CLIENT_DOCKER_FILE_PATH }}
 
-    - name: Build and push Worker Service Client image to registry
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-        tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.WORKERSERVICE_CLIENT_IMAGE_NAME }}:${{ github.sha }}
-        file: ${{ env.WORKERSERVICE_CLIENT_DOCKER_FILE_PATH }}
+    # - name: Build and push Worker Service Client image to registry
+    #   uses: docker/build-push-action@v2
+    #   with:
+    #     push: true
+    #     tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.WORKERSERVICE_CLIENT_IMAGE_NAME }}:${{ github.sha }}
+    #     file: ${{ env.WORKERSERVICE_CLIENT_DOCKER_FILE_PATH }}
 
-    - name: Build and push Scaler image to registry
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-        tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.SCALER_IMAGE_NAME }}:${{ github.sha }}
-        file: ${{ env.SCALER_DOCKER_FILE_PATH }}
+    # - name: Build and push Scaler image to registry
+    #   uses: docker/build-push-action@v2
+    #   with:
+    #     push: true
+    #     tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.SCALER_IMAGE_NAME }}:${{ github.sha }}
+    #     file: ${{ env.SCALER_DOCKER_FILE_PATH }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -199,25 +199,25 @@ jobs:
 
           az containerapp update -n minimalapiclient -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.MINIMAL_CLIENT_IMAGE_NAME }}:${{ github.sha }}
 
-    - name: Deploy Worker Service Client
-      uses: azure/CLI@v1
-      with:
-        inlineScript: >
-          echo "Deploying Worker Service Client"
+    # - name: Deploy Worker Service Client
+    #   uses: azure/CLI@v1
+    #   with:
+    #     inlineScript: >
+    #       echo "Deploying Worker Service Client"
           
-          az containerapp registry set -n workerserviceclient -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
+    #       az containerapp registry set -n workerserviceclient -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
 
-          az containerapp update -n workerserviceclient -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.WORKERSERVICE_CLIENT_IMAGE_NAME }}:${{ github.sha }}
+    #       az containerapp update -n workerserviceclient -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.WORKERSERVICE_CLIENT_IMAGE_NAME }}:${{ github.sha }}
 
-    - name: Deploy Scaler
-      uses: azure/CLI@v1
-      with:
-        inlineScript: >
-          echo "Deploying Scaler"
+    # - name: Deploy Scaler
+    #   uses: azure/CLI@v1
+    #   with:
+    #     inlineScript: >
+    #       echo "Deploying Scaler"
           
-          az containerapp registry set -n scaler -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
+    #       az containerapp registry set -n scaler -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
 
-          az containerapp update -n scaler -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.SCALER_IMAGE_NAME }}:${{ github.sha }}
+    #       az containerapp update -n scaler -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.SCALER_IMAGE_NAME }}:${{ github.sha }}
 
     - name: logout
       run: >
