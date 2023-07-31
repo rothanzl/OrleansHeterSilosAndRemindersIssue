@@ -171,5 +171,6 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
 output key string = account.listKeys().primaryMasterKey
 
 output connectionString string = account.listConnectionStrings().connectionStrings[0].connectionString
-output uri string = account.properties.keyVaultKeyUri
+output uri string = account.properties.documentEndpoint
+// output uri2 string = account.properties.sqlEndpoint
 output storageName string = account.name
