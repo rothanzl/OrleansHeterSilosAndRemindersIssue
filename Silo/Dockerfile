@@ -11,6 +11,7 @@ WORKDIR /src
 COPY ["Silo/Silo.csproj", "Silo/"]
 COPY ["Abstractions/Abstractions.csproj", "Abstractions/"]
 COPY ["Grains/Grains.csproj", "Grains/"]
+COPY ["Common.Orleans/Common.Orleans.csproj", "Common.Orleans/"]
 RUN dotnet restore "Silo/Silo.csproj"
 COPY . .
 WORKDIR "/src/Silo"

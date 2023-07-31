@@ -1,15 +1,5 @@
-using Abstractions;
-using Orleans;
-using Orleans.Configuration;
-using Orleans.Hosting;
-using Orleans.Runtime;
-using System.Diagnostics;
-using System.Net;
-using System.Text;
-using System.Web;
 using Clients.MinimalApi;
 using Clients.MinimalApi.Bomber;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +10,7 @@ builder.Services.AddMvc(options => options.OutputFormatters.Add(new HtmlOutputFo
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddWebAppApplicationInsights("Minimal API Client");
+// builder.Services.AddWebAppApplicationInsights("Minimal API Client");
 
 // if debugging, wait for the back-end services to start before connecting
 // if(Debugger.IsAttached)
