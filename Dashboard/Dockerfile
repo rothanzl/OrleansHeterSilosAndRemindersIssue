@@ -11,6 +11,7 @@ WORKDIR /src
 COPY ["Dashboard/Dashboard.csproj", "Dashboard/"]
 COPY ["Abstractions/Abstractions.csproj", "Abstractions/"]
 COPY ["Grains/Grains.csproj", "Grains/"]
+COPY ["Common.Orleans/Common.Orleans.csproj", "Common.Orleans/"]
 RUN dotnet restore "Dashboard/Dashboard.csproj"
 COPY . .
 WORKDIR "/src/Dashboard"
