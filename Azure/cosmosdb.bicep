@@ -37,11 +37,11 @@ param maxIntervalInSeconds int = 300
 @description('Enable system managed failover for regions')
 param systemManagedFailover bool = true
 
-@description('The name for the database')
-param databaseName string = 'myDatabase'
+// @description('The name for the database')
+// param databaseName string = 'myDatabase'
 
-@description('The name for the container')
-param containerName string = 'myContainer'
+// @description('The name for the container')
+// param containerName string = 'myContainer'
 
 @minValue(400)
 @maxValue(1000000)
@@ -92,81 +92,81 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
   }
 }
 
-resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15' = {
-  name: '${account.name}/${databaseName}'
-  properties: {
-    resource: {
-      id: databaseName
-    }
-  }
-}
+// resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15' = {
+//   name: '${account.name}/${databaseName}'
+//   properties: {
+//     resource: {
+//       id: databaseName
+//     }
+//   }
+// }
 
-resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2022-05-15' = {
-  name: '${database.name}/${containerName}'
-  properties: {
-    resource: {
-      id: containerName
-      partitionKey: {
-        paths: [
-          '/myPartitionKey'
-        ]
-        kind: 'Hash'
-      }
-      indexingPolicy: {
-        indexingMode: 'consistent'
-        includedPaths: [
-          {
-            path: '/*'
-          }
-        ]
-        excludedPaths: [
-          {
-            path: '/myPathToNotIndex/*'
-          }
-          {
-            path: '/_etag/?'
-          }
-        ]
-        compositeIndexes: [
-          [
-            {
-              path: '/name'
-              order: 'ascending'
-            }
-            {
-              path: '/age'
-              order: 'descending'
-            }
-          ]
-        ]
-        spatialIndexes: [
-          {
-            path: '/location/*'
-            types: [
-              'Point'
-              'Polygon'
-              'MultiPolygon'
-              'LineString'
-            ]
-          }
-        ]
-      }
-      defaultTtl: 86400
-      uniqueKeyPolicy: {
-        uniqueKeys: [
-          {
-            paths: [
-              '/phoneNumber'
-            ]
-          }
-        ]
-      }
-    }
-    options: {
-      throughput: throughput
-    }
-  }
-}
+// resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2022-05-15' = {
+//   name: '${database.name}/${containerName}'
+//   properties: {
+//     resource: {
+//       id: containerName
+//       partitionKey: {
+//         paths: [
+//           '/myPartitionKey'
+//         ]
+//         kind: 'Hash'
+//       }
+//       indexingPolicy: {
+//         indexingMode: 'consistent'
+//         includedPaths: [
+//           {
+//             path: '/*'
+//           }
+//         ]
+//         excludedPaths: [
+//           {
+//             path: '/myPathToNotIndex/*'
+//           }
+//           {
+//             path: '/_etag/?'
+//           }
+//         ]
+//         compositeIndexes: [
+//           [
+//             {
+//               path: '/name'
+//               order: 'ascending'
+//             }
+//             {
+//               path: '/age'
+//               order: 'descending'
+//             }
+//           ]
+//         ]
+//         spatialIndexes: [
+//           {
+//             path: '/location/*'
+//             types: [
+//               'Point'
+//               'Polygon'
+//               'MultiPolygon'
+//               'LineString'
+//             ]
+//           }
+//         ]
+//       }
+//       defaultTtl: 86400
+//       uniqueKeyPolicy: {
+//         uniqueKeys: [
+//           {
+//             paths: [
+//               '/phoneNumber'
+//             ]
+//           }
+//         ]
+//       }
+//     }
+//     options: {
+//       throughput: throughput
+//     }
+//   }
+// }
 
 output key string = account.listKeys().primaryMasterKey
 
