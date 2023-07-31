@@ -86,6 +86,8 @@ module silo 'silo.bicep' = {
     registry: acr.name
     registryPassword: acr.listCredentials().passwords[0].value
     registryUsername: acr.listCredentials().username
+    allowExternalIngress: true
+    targetIngressPort: 80
     envVars : shared_config
     scalerUrl: scaler.outputs.fqdn
   }

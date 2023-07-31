@@ -8,6 +8,8 @@ param registryUsername string
 param minReplicas int = 1
 param maxReplicas int = 10
 param scalerUrl string
+param allowExternalIngress bool = false
+param targetIngressPort int = 80
 @secure()
 param registryPassword string
 
@@ -31,6 +33,10 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
           passwordSecretRef: 'container-registry-password'
         }
       ]
+      ingress: {
+        external: allowExternalIngress
+        targetPort: targetIngressPort
+      }
     }
     template: {
       containers: [
