@@ -4,11 +4,20 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Runtime;
 using System.Diagnostics;
+using System.Net;
+using System.Text;
+using System.Web;
+using Clients.MinimalApi;
 using Clients.MinimalApi.Bomber;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddMvc(options => options.OutputFormatters.Add(new HtmlOutputFormatter()));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddWebAppApplicationInsights("Minimal API Client");
@@ -23,6 +32,7 @@ builder.Services.AddWebAppApplicationInsights("Minimal API Client");
 // builder.Services.ConnectOrleansClient();
 
 var app = builder.Build();
+app.UseStaticFiles();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -38,6 +48,9 @@ if (app.Environment.IsDevelopment())
 Console.WriteLine("Client about to connect to silo host \n");
 // await _clusterClient.Connect();
 Console.WriteLine("Client successfully connected to silo host \n");
+
+var testAppUrl = app.Configuration.GetValue<string>("TestAppUrl") ?? "localhost:5000";
+var tester = new Tester(testAppUrl);
 
 // -------------------
 // map the API methods
@@ -76,11 +89,22 @@ app.MapGet("/", () => "The silo is up and running.")
 //   .WithName("Welcome");
 
 
-app.MapGet("/tester/start", async () =>
-{
-    var startResult = Tester.Start();
-    return Results.Ok(startResult.ToString());
-});
+app.MapGet("/tester/start", () => Task.FromResult(Results.Ok(tester.Start().ToString())));
+app.MapGet("/tester/state", () => Task.FromResult(Results.Ok(tester.State().ToString())));
+
+app.MapControllers();
+// app.MapGet("/tester/result/{path}", ([FromRoute] string path) =>
+// {
+//     var decodedPath = HttpUtility.UrlDecode(path);
+//     // var result = new HttpResponseMessage()
+//     // {
+//     //     Content = new StringContent(Reports.GetHtmlReport(decodedPath), Encoding.UTF8, "text/html"),
+//     //     StatusCode = HttpStatusCode.OK,
+//     //
+//     // };
+//     // return Task.FromResult(result);
+//     return Task.FromResult(Results.Ok(Reports.GetHtmlReport(decodedPath)));
+// });
 
 
 app.Run();

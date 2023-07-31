@@ -1,13 +1,19 @@
 namespace Clients.MinimalApi.Bomber;
 
-public class Reports
+public static class Reports
 {
+    private const string DirName = "reports";
     
-    public string[] GetLogDirectories() => Directory.GetDirectories("reports");
+    
+    public static string[] GetLogDirectories() => Directory
+        .GetDirectories(DirName)
+        .Select(s => s.Substring(DirName.Length + 1))
+        .OrderByDescending(s => s)
+        .ToArray();
 
-    public string GetHtmlReport(string path)
+    public static string GetHtmlReport(string path)
     {
-        var files = Directory.GetFiles(path);
+        var files = Directory.GetFiles(Path.Join(DirName, path));
 
         var file = files.FirstOrDefault(f => f.ToLower().EndsWith(".html"));
         if (file is null)
