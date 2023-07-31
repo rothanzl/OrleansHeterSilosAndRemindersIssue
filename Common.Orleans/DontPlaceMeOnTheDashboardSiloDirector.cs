@@ -21,8 +21,9 @@ namespace Common.Orleans
         public async Task<SiloAddress> OnAddActivation(PlacementStrategy strategy, PlacementTarget target, IPlacementContext context)
         {
             var activeSilos = await ManagementGrain.GetDetailedHosts(onlyActive: true);
+            _logger.LogInformation($"Silos[{activeSilos.Length}] wiht names {string.Join(", ", activeSilos.Select(s => s.SiloName))}");
             _logger.LogInformation($"Silos[{activeSilos.Length}] wiht names {string.Join(", ", activeSilos.Select(s => s.RoleName))}");
-            var silos = activeSilos.Where(x => !x.RoleName.ToLower().Contains("dashboard")).Select(x => x.SiloAddress).ToArray();
+            var silos = activeSilos.Where(x => !x.SiloName.ToLower().Contains("dashboard")).Select(x => x.SiloAddress).ToArray();
             return silos[new Random().Next(0, silos.Length)];
         }
     }
