@@ -1,4 +1,4 @@
-namespace Silo;
+namespace Common.Orleans;
 
 public class CosmosDbConfig
 {

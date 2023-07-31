@@ -1,12 +1,17 @@
-using Grains;
-using Orleans;
+
+using Common.Orleans;
+using Microsoft.Azure.Cosmos;
+using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
-using Orleans.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddWebAppApplicationInsights("Dashboard");
-builder.Host.UseOrleans(siloBuilder =>
+
+// builder.Services.AddWebAppApplicationInsights("Dashboard");
+builder.Host.UseOrleans((ctx, siloBuilder) =>
 {
+    var cosmosDbKey = ctx.Configuration.GetValue<string>("CosmosDbKey");
+    var cosmosDbUri = ctx.Configuration.GetValue<string>("CosmosDbUri");
+    
     siloBuilder
         .Configure<ClusterOptions>(options =>
         {
@@ -18,8 +23,13 @@ builder.Host.UseOrleans(siloBuilder =>
             options.SiloName = "Dashboard";
         })
         .ConfigureEndpoints(siloPort: 11_112, gatewayPort: 30_001)
-        .UseAzureStorageClustering(options => options.ConfigureTableServiceClient(builder.Configuration.GetValue<string>("StorageConnectionString")))
-        .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(SensorTwinGrain).Assembly).WithReferences())
+        .UseCosmosClustering((CosmosClusteringOptions opt) =>
+        {
+            opt.IsResourceCreationEnabled = true;
+            opt.DatabaseName = CosmosDbConfig.CosmosOrleansDbName;
+            opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
+            opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
+        })
         .UseDashboard(config => 
             config.HideTrace = 
                 !string.IsNullOrEmpty(builder.Configuration.GetValue<string>("HideTrace")) 

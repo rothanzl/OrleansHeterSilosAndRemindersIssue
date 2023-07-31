@@ -1,9 +1,8 @@
-﻿using Grains;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Runtime;
 using Orleans.Runtime.Placement;
 
-namespace Orleans.Hosting
+namespace Common.Orleans
 {
     public static class DontHostGrainsHereServiceCollectionExtensions
     {

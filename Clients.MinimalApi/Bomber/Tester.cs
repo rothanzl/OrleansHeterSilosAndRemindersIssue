@@ -54,7 +54,7 @@ public class Tester
 
         var scenario = Scenario.Create("base_scenario", ExecutionMethod)
             .WithWarmUpDuration(TimeSpan.FromSeconds(5))
-            .WithLoadSimulations(Simulation.Inject(rate: 10, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30)))
+            .WithLoadSimulations(Simulation.RampingInject(rate: 500, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30)))
             .WithMaxFailCount(Int32.MaxValue);
 
 

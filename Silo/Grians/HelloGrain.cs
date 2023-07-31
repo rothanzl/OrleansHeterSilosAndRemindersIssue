@@ -1,5 +1,9 @@
+using Common.Orleans;
+
 namespace Silo.Grians;
 
+
+[DontPlaceMeOnTheDashboard]
 public class HelloGrain : Grain, IHelloGrain
 {
     public Task<string> SayHello()

@@ -1,9 +1,8 @@
-﻿using Orleans;
-using Orleans.Placement;
+﻿using Orleans.Placement;
 using Orleans.Runtime;
 using Orleans.Runtime.Placement;
 
-namespace Grains
+namespace Common.Orleans
 {
     public class DontPlaceMeOnTheDashboardSiloDirector : IPlacementDirector
     {
