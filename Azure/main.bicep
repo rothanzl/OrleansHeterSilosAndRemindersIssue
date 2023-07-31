@@ -109,6 +109,14 @@ module dashboard 'dashboard.bicep' = {
   }
 }
 
+var minimal_client_config = union(shared_config, 
+  [
+    {
+      name: 'TestAppUrl'
+      value: silo.outputs.url
+    }
+  ])
+
 module minimalapiclient 'minimalapiclient.bicep' = {
   name: 'minimalapiclient'
   params: {
@@ -121,7 +129,7 @@ module minimalapiclient 'minimalapiclient.bicep' = {
     allowExternalIngress: true
     targetIngressPort: 80
     maxReplicas: 1
-    envVars : shared_config
+    envVars : minimal_client_config
   }
 }
 
