@@ -27,7 +27,7 @@ builder
             })
             .ConfigureEndpoints(siloPort: 11_111, gatewayPort: 30_000);
 
-        if (cosmosDbKey is { } || cosmosDbUri is { })
+        if (cosmosDbKey is { } && cosmosDbUri is { })
         {
             siloBuilder.UseCosmosClustering((CosmosClusteringOptions opt) =>
             {
