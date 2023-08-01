@@ -6,7 +6,7 @@ param envVars array = []
 param registry string
 param registryUsername string
 param minReplicas int = 1
-param maxReplicas int = 10
+param maxReplicas int = 1
 // param scalerUrl string
 param allowExternalIngress bool = false
 param targetIngressPort int = 80
@@ -46,9 +46,9 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
           env: envVars
         }
       ]
-      // scale: {
-      //   minReplicas: minReplicas
-      //   maxReplicas: maxReplicas
+      scale: {
+        minReplicas: minReplicas
+        maxReplicas: maxReplicas
       //   rules: [
       //     {
       //       name: 'scaler'
@@ -63,7 +63,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
       //       }
       //     }
       //   ]
-      // }
+      }
     }
   }
 }
