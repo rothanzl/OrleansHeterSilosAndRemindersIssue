@@ -10,6 +10,9 @@ builder.Services.AddMvc(options => options.OutputFormatters.Add(new HtmlOutputFo
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var testAppUrl = builder.Configuration.GetValue<string>("TestAppUrl") ?? "localhost:5000";
+builder.Services.AddSingleton(new Tester(testAppUrl));
 // builder.Services.AddWebAppApplicationInsights("Minimal API Client");
 
 // if debugging, wait for the back-end services to start before connecting
@@ -39,8 +42,6 @@ Console.WriteLine("Client about to connect to silo host \n");
 // await _clusterClient.Connect();
 Console.WriteLine("Client successfully connected to silo host \n");
 
-var testAppUrl = app.Configuration.GetValue<string>("TestAppUrl") ?? "localhost:5000";
-var tester = new Tester(testAppUrl);
 
 // -------------------
 // map the API methods
@@ -78,9 +79,6 @@ app.MapGet("/", () => "The silo is up and running.")
 // }).Produces<WelcomeMessage>(StatusCodes.Status200OK)
 //   .WithName("Welcome");
 
-
-app.MapGet("/tester/start", () => Task.FromResult(Results.Ok(tester.Start().ToString())));
-app.MapGet("/tester/state", () => Task.FromResult(Results.Ok(tester.State().ToString())));
 
 app.MapControllers();
 // app.MapGet("/tester/result/{path}", ([FromRoute] string path) =>

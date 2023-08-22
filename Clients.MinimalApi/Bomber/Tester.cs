@@ -1,8 +1,16 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using NBomber.Contracts;
 using NBomber.CSharp;
 
 namespace Clients.MinimalApi.Bomber;
+
+
+public record StartTestRequest(
+    [property:DefaultValue(500)] int Rate, 
+    [property:DefaultValue(30)] int RampSeconds, 
+    [property:DefaultValue(180)] int DurationSeconds,
+    [property:DefaultValue(0)] long CounterStartValue);
 
 public class Tester
 {
@@ -16,17 +24,17 @@ public class Tester
         _sw = new();
     }
 
-    public StateResult Start()
+    public StateResult Start(StartTestRequest req)
     {
         if(_testTask is {} && !_testTask.IsCompleted)
             return new StateResult(State: "Error: Test already running");
         
-        _testTask = Task.Run(StartTests);
+        _testTask = Task.Run(() => StartTests(req));
         return new StateResult(State: "Started");
     }
 
 
-    private void StartTests()
+    private void StartTests(StartTestRequest req)
     {
         _sw.Restart();
         
@@ -35,7 +43,7 @@ public class Tester
         using HttpClient httpClient = new(clientHandler);
 
         object mutex = new();
-        long counter = 0;
+        long counter = req.CounterStartValue;
         
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
         {
@@ -54,7 +62,8 @@ public class Tester
 
         var scenario = Scenario.Create("base_scenario", ExecutionMethod)
             .WithWarmUpDuration(TimeSpan.FromSeconds(5))
-            .WithLoadSimulations(Simulation.RampingInject(rate: 500, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(30)))
+            .WithLoadSimulations(Simulation.RampingInject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(req.RampSeconds)))
+            .WithLoadSimulations(Simulation.Inject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(req.DurationSeconds)))
             .WithMaxFailCount(Int32.MaxValue);
 
 
