@@ -53,12 +53,20 @@ public class Tester
             {
                 safeCounter = counter++;
             }
-            
-            var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safeCounter}");
-            
-            return response.IsSuccessStatusCode
-                ? Response.Ok()
-                : Response.Fail();
+
+            try
+            {
+                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safeCounter}");
+                var responseContentBytes = await response.Content.ReadAsByteArrayAsync();
+
+                return response.IsSuccessStatusCode
+                    ? Response.Ok(payload: safeCounter, statusCode: response.StatusCode.ToString(), sizeBytes: responseContentBytes.Length)
+                    : Response.Fail(statusCode: response.StatusCode.ToString());
+            }
+            catch (Exception e)
+            {
+                return Response.Fail(message: e.ToString());
+            }
         }
 
         var scenario = Scenario.Create("base_scenario", ExecutionMethod)
