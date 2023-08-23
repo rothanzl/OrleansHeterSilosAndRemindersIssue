@@ -8,9 +8,10 @@ namespace Clients.MinimalApi.Bomber;
 
 public record StartTestRequest(
     [property:DefaultValue(500)] int Rate, 
-    [property:DefaultValue(30)] int RampSeconds, 
-    [property:DefaultValue(180)] int DurationSeconds,
-    [property:DefaultValue(0)] long CounterStartValue);
+    [property:DefaultValue(0.5)] int RampMinutes, 
+    [property:DefaultValue(3)] int DurationMinutes,
+    [property:DefaultValue(0)] long CounterStartValue,
+    [property:DefaultValue(Int32.MaxValue)] int MaxFailedCount);
 
 public class Tester
 {
@@ -62,9 +63,9 @@ public class Tester
 
         var scenario = Scenario.Create("base_scenario", ExecutionMethod)
             .WithWarmUpDuration(TimeSpan.FromSeconds(5))
-            .WithLoadSimulations(Simulation.RampingInject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(req.RampSeconds)))
-            .WithLoadSimulations(Simulation.Inject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromSeconds(req.DurationSeconds)))
-            .WithMaxFailCount(Int32.MaxValue);
+            .WithLoadSimulations(Simulation.RampingInject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromMinutes(req.RampMinutes)))
+            .WithLoadSimulations(Simulation.Inject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromMinutes(req.DurationMinutes)))
+            .WithMaxFailCount(req.MaxFailedCount);
 
 
         NBomberRunner
