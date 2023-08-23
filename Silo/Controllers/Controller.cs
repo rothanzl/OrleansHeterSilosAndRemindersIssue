@@ -9,13 +9,15 @@ namespace Silo.Controllers;
 public class Controller : ControllerBase
 {
     private readonly IGrainFactory _grainFactory;
+    private readonly ILogger<Controller> _logger;
 
     private static int Counter = 0;
     private static object CounterMutex = new();
 
-    public Controller(IGrainFactory grainFactory)
+    public Controller(IGrainFactory grainFactory, ILogger<Controller> logger)
     {
         _grainFactory = grainFactory;
+        _logger = logger;
     }
 
 
@@ -43,8 +45,16 @@ public class Controller : ControllerBase
         if (string.IsNullOrWhiteSpace(name))
             return "Name is empty!";
 
-
-        var hello = await _grainFactory.GetGrain<IHelloGrain>(name).SayHello();
+        string hello;
+        try
+        {
+            hello = await _grainFactory.GetGrain<IHelloGrain>(name).SayHello();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "SayHello error");
+            throw;
+        }
 
         return Ok(hello);
     }
