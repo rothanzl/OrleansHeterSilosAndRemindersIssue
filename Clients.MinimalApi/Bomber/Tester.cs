@@ -8,8 +8,8 @@ namespace Clients.MinimalApi.Bomber;
 
 public record StartTestRequest(
     [property:DefaultValue(500)] int Rate, 
-    [property:DefaultValue(0.5)] int RampMinutes, 
-    [property:DefaultValue(3)] int DurationMinutes,
+    [property:DefaultValue(0.5)] double RampMinutes, 
+    [property:DefaultValue(3)] double DurationMinutes,
     [property:DefaultValue(0)] long CounterStartValue,
     [property:DefaultValue(Int32.MaxValue)] int MaxFailedCount);
 
@@ -84,7 +84,7 @@ public class Tester
             return new StateResult("Tests has been canceled");
         
         if(_testTask.IsFaulted)
-            return new StateResult("Tests faulted");
+            return new StateResult("Tests faulted: " + _testTask.Exception?.ToString());
         
         if(_testTask.IsCompleted)
             return new StateResult($"Tests completed in {_sw.Elapsed}");

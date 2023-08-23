@@ -47,6 +47,9 @@ public class ReportController : ControllerBase
     [HttpPost("/tester/start")]
     public IActionResult StartTester([FromBody] StartTestRequest req)
     {
+        if (req is null)
+            return BadRequest("Request body error");
+        
         return Ok(_tester.Start(req).ToString());
     }
 
