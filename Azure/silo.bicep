@@ -19,7 +19,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
   properties: {
     managedEnvironmentId: containerAppEnvironmentId
     configuration: {
-      activeRevisionsMode: 'multiple'
+      activeRevisionsMode: 'Single'
       secrets: [
         {
           name: 'container-registry-password'
