@@ -9,9 +9,9 @@ namespace Clients.MinimalApi.Bomber;
 public record StartTestRequest(
     [property:DefaultValue(500)] int Rate, 
     [property:DefaultValue(0.5)] double RampMinutes, 
-    [property:DefaultValue(3)] double DurationMinutes,
+    [property:DefaultValue(30)] double DurationMinutes,
     [property:DefaultValue(0)] long CounterStartValue,
-    [property:DefaultValue(Int32.MaxValue)] int MaxFailedCount);
+    [property:DefaultValue(100)] int MaxFailedCount);
 
 public class Tester
 {
