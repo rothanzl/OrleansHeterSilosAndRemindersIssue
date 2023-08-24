@@ -16,6 +16,9 @@
     
     
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
+    
+    
+    <PackageReference Include="objecthydrator" Version="1.3.0" />
   </ItemGroup>
 
   <ItemGroup>
