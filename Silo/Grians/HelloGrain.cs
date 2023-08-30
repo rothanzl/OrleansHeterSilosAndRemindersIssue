@@ -40,7 +40,7 @@ public class HelloGrain : Grain, IHelloGrain
     {
         var pk = this.GetPrimaryKeyString()!;
 
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 100; i++)
         {
             string subGrainId = pk + "-sg" + i;
             await GrainFactory.GetGrain<IHelloGrain>(subGrainId).SayHello();
