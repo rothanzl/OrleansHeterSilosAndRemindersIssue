@@ -36,14 +36,14 @@ public class HelloGrain : Grain, IHelloGrain
     }
 
 
-    public async Task<string> SayHello()
+    public async Task<string> SayHello(int subgrainsCount)
     {
         var pk = this.GetPrimaryKeyString()!;
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < subgrainsCount; i++)
         {
             string subGrainId = pk + "-sg" + i;
-            await GrainFactory.GetGrain<IHelloGrain>(subGrainId).SayHello();
+            await GrainFactory.GetGrain<IHelloGrain>(subGrainId).SayHello(0);
         }
         
         

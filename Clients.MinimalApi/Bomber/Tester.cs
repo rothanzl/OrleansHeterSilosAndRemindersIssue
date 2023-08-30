@@ -11,7 +11,9 @@ public record StartTestRequest(
     [property:DefaultValue(0.5)] double RampMinutes, 
     [property:DefaultValue(30)] double DurationMinutes,
     [property:DefaultValue(0)] long CounterStartValue,
-    [property:DefaultValue(100)] int MaxFailedCount);
+    [property:DefaultValue(100)] int MaxFailedCount,
+    [property:DefaultValue(100)] int SubGrainsCount
+    );
 
 public class Tester
 {
@@ -56,7 +58,7 @@ public class Tester
 
             try
             {
-                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safeCounter}");
+                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safeCounter}/{req.SubGrainsCount}");
                 var responseContentBytes = await response.Content.ReadAsByteArrayAsync();
 
                 return response.IsSuccessStatusCode
