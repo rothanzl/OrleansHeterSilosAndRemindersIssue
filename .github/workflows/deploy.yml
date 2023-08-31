@@ -48,24 +48,24 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Create resource group
-      uses: azure/CLI@v1
-      with:
-        inlineScript: >
-          echo "Creating resource group in Azure"
-          echo "Executing 'az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}'"
+    # - name: Create resource group
+    #   uses: azure/CLI@v1
+    #   with:
+    #     inlineScript: >
+    #       echo "Creating resource group in Azure"
+    #       echo "Executing 'az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}'"
 
-          az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}
+    #       az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}
 
-    - name: Creating resources
-      uses: azure/CLI@v1
-      with:
-        inlineScript: >
-          echo "Creating resources"
+    # - name: Creating resources
+    #   uses: azure/CLI@v1
+    #   with:
+    #     inlineScript: >
+    #       echo "Creating resources"
           
-          echo "Executing az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug"
+    #       echo "Executing az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug"
 
-          az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug
+    #       az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug
 
   build:
     runs-on: ubuntu-latest

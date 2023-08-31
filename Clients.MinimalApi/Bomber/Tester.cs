@@ -20,10 +20,12 @@ public class Tester
     private Task? _testTask;
     private Stopwatch _sw;
     private readonly string _testHostUrl;
+    private readonly ILogger<Tester> _logger;
 
-    public Tester(string testHostUrl)
+    public Tester(string testHostUrl, ILogger<Tester> logger)
     {
         _testHostUrl = testHostUrl;
+        _logger = logger;
         _sw = new();
     }
 
@@ -47,18 +49,48 @@ public class Tester
 
         object mutex = new();
         long counter = req.CounterStartValue;
+        double subGrainCount = req.SubGrainsCount;
+        TimeSpan lastDuration = TimeSpan.Zero;
+
+        var cycleUpperThreshold = TimeSpan.FromMilliseconds(999);
+        var cycleLowerThreshold = TimeSpan.FromMilliseconds(500);
+        
         
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
         {
             long safeCounter;
+            int safeSubGrainCount;
             lock (mutex)
             {
-                safeCounter = counter++;
-            }
+                if (lastDuration > cycleUpperThreshold)
+                {
+                    subGrainCount *= 0.9;
+                }else if (lastDuration < cycleLowerThreshold)
+                {
+                    subGrainCount *= 1.1;
+                }
 
+                if (subGrainCount < 1)
+                    subGrainCount = 1;
+                
+                safeCounter = counter++;
+                safeSubGrainCount = Convert.ToInt32(subGrainCount);
+            }
+            
+            _logger.LogInformation("Prim grain {PrimGrain}, sub grains count {Count}", safeCounter, safeSubGrainCount);
+            
             try
             {
-                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safeCounter}/{req.SubGrainsCount}");
+                Stopwatch sw = Stopwatch.StartNew();
+                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safeCounter}/{safeSubGrainCount}");
+                sw.Stop();
+
+                lock (mutex)
+                {
+                    lastDuration = sw.Elapsed;
+                }
+                
+                
                 var responseContentBytes = await response.Content.ReadAsByteArrayAsync();
 
                 return response.IsSuccessStatusCode

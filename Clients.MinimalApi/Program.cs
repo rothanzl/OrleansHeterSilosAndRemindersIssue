@@ -12,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var testAppUrl = builder.Configuration.GetValue<string>("TestAppUrl") ?? "localhost:5000";
-builder.Services.AddSingleton(new Tester(testAppUrl));
+builder.Services.AddSingleton(sp => new Tester(testAppUrl, sp.GetRequiredService<ILogger<Tester>>()));
 // builder.Services.AddWebAppApplicationInsights("Minimal API Client");
 
 // if debugging, wait for the back-end services to start before connecting
