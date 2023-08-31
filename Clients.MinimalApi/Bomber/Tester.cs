@@ -53,8 +53,8 @@ public class Tester
         double subGrainCount = req.SubGrainsCount;
         TimeSpan lastDuration = TimeSpan.Zero;
 
-        var cycleUpperThreshold = TimeSpan.FromMilliseconds(1000) / req.Rate;
-        var cycleLowerThreshold = TimeSpan.FromMilliseconds(950) / req.Rate;
+        var cycleUpperThreshold = TimeSpan.FromMilliseconds(1000);
+        var cycleLowerThreshold = TimeSpan.FromMilliseconds(950);
         
         
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
