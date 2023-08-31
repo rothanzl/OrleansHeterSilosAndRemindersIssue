@@ -7,9 +7,9 @@ namespace Clients.MinimalApi.Bomber;
 
 
 public record StartTestRequest(
-    [property:DefaultValue(500)] int Rate, 
-    [property:DefaultValue(0.5)] double RampMinutes, 
-    [property:DefaultValue(30)] double DurationMinutes,
+    [property:DefaultValue(1)] int Rate, 
+    [property:DefaultValue(0)] double RampMinutes, 
+    [property:DefaultValue(60)] double DurationMinutes,
     [property:DefaultValue(0)] long CounterStartValue,
     [property:DefaultValue(100)] int MaxFailedCount,
     [property:DefaultValue(100)] int SubGrainsCount
@@ -53,8 +53,8 @@ public class Tester
         double subGrainCount = req.SubGrainsCount;
         TimeSpan lastDuration = TimeSpan.Zero;
 
-        var cycleUpperThreshold = TimeSpan.FromMilliseconds(999);
-        var cycleLowerThreshold = TimeSpan.FromMilliseconds(900);
+        var cycleUpperThreshold = TimeSpan.FromMilliseconds(1000) / req.Rate;
+        var cycleLowerThreshold = TimeSpan.FromMilliseconds(950) / req.Rate;
         
         
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
@@ -101,8 +101,12 @@ public class Tester
                 var responseContentBytes = await response.Content.ReadAsByteArrayAsync();
 
                 return response.IsSuccessStatusCode
-                    ? Response.Ok(payload: safePrimGrainCounter, statusCode: response.StatusCode.ToString(), sizeBytes: responseContentBytes.Length)
-                    : Response.Fail(statusCode: response.StatusCode.ToString());
+                    ? Response.Ok(
+                        payload: safePrimGrainCounter, 
+                        statusCode: response.StatusCode.ToString(), 
+                        sizeBytes: safeSubGrainCount + 1)
+                    : Response.Fail(
+                        statusCode: response.StatusCode.ToString());
             }
             catch (Exception e)
             {
