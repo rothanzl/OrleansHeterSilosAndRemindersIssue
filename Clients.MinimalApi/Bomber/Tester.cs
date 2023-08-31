@@ -48,7 +48,8 @@ public class Tester
         using HttpClient httpClient = new(clientHandler);
 
         object mutex = new();
-        long counter = req.CounterStartValue;
+        long primGrainCounter = req.CounterStartValue;
+        long totalActivatedGrains = 0;
         double subGrainCount = req.SubGrainsCount;
         TimeSpan lastDuration = TimeSpan.Zero;
 
@@ -58,7 +59,7 @@ public class Tester
         
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
         {
-            long safeCounter;
+            long safePrimGrainCounter;
             int safeSubGrainCount;
             lock (mutex)
             {
@@ -73,28 +74,34 @@ public class Tester
                 if (subGrainCount < 1)
                     subGrainCount = 1;
                 
-                safeCounter = counter++;
+                safePrimGrainCounter = primGrainCounter++;
                 safeSubGrainCount = Convert.ToInt32(subGrainCount);
             }
             
-            _logger.LogInformation("Prim grain {PrimGrain}, sub grains count {Count}", safeCounter, safeSubGrainCount);
+            _logger.LogInformation("Prim grain {PrimGrain}, sub grains count {Count}", safePrimGrainCounter, safeSubGrainCount);
             
             try
             {
                 Stopwatch sw = Stopwatch.StartNew();
-                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safeCounter}/{safeSubGrainCount}");
+                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safePrimGrainCounter}/{safeSubGrainCount}");
                 sw.Stop();
 
                 lock (mutex)
                 {
                     lastDuration = sw.Elapsed;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        totalActivatedGrains += safeSubGrainCount + 1;
+                    }
+                    
                 }
                 
                 
                 var responseContentBytes = await response.Content.ReadAsByteArrayAsync();
 
                 return response.IsSuccessStatusCode
-                    ? Response.Ok(payload: safeCounter, statusCode: response.StatusCode.ToString(), sizeBytes: responseContentBytes.Length)
+                    ? Response.Ok(payload: safePrimGrainCounter, statusCode: response.StatusCode.ToString(), sizeBytes: responseContentBytes.Length)
                     : Response.Fail(statusCode: response.StatusCode.ToString());
             }
             catch (Exception e)
@@ -113,8 +120,10 @@ public class Tester
         NBomberRunner
             .RegisterScenarios(scenario)
             .Run();
-
+        
         _sw.Stop();
+        
+        _logger.LogWarning("Tester ended with {Count} total activated grains in {Time}", totalActivatedGrains, _sw.Elapsed);
     }
 
     public StateResult State()
