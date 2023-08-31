@@ -53,7 +53,7 @@ public class Tester
         TimeSpan lastDuration = TimeSpan.Zero;
 
         var cycleUpperThreshold = TimeSpan.FromMilliseconds(999);
-        var cycleLowerThreshold = TimeSpan.FromMilliseconds(500);
+        var cycleLowerThreshold = TimeSpan.FromMilliseconds(900);
         
         
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
