@@ -69,7 +69,7 @@ public class Tester
 
                 _logger.LogInformation("Prim grain {PrimGrain}, activated grains {Count}", safePrimGrainCounter, activatedGrains);
 
-                return response.IsSuccessStatusCode
+                return activatedGrains > 0
                     ? Response.Ok(
                         payload: safePrimGrainCounter, 
                         statusCode: response.StatusCode.ToString(), 
