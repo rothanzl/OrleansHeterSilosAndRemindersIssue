@@ -33,7 +33,7 @@ public class HelloGrain : Grain, IHelloGrain
         
         State = hydrator.Generate();
         
-        DelayDeactivation(TimeSpan.FromMinutes(60));
+        DelayDeactivation(TimeSpan.FromHours(24));
         
         return base.OnActivateAsync(cancellationToken);
     }

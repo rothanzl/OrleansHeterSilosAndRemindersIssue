@@ -72,10 +72,11 @@ public class Tester
                 return activatedGrains > 2
                     ? Response.Ok(
                         payload: safePrimGrainCounter, 
-                        statusCode: response.StatusCode.ToString(), 
-                        sizeBytes: activatedGrains)
+                        statusCode: response.StatusCode.ToString(),
+                        message: $"ActivatedGrains-{activatedGrains}")
                     : Response.Fail(
-                        statusCode: response.StatusCode.ToString());
+                        statusCode: response.StatusCode.ToString(),
+                        message: $"ActivatedGrains-{activatedGrains}");
             }
             catch (Exception e)
             {
