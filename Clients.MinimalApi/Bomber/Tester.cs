@@ -1,24 +1,13 @@
-using System.ComponentModel;
 using System.Diagnostics;
 using NBomber.Contracts;
 using NBomber.CSharp;
 
 namespace Clients.MinimalApi.Bomber;
 
-
-public record StartTestRequest(
-    [property:DefaultValue(1)] int Rate, 
-    [property:DefaultValue(0)] double RampMinutes, 
-    [property:DefaultValue(60)] double DurationMinutes,
-    [property:DefaultValue(0)] long CounterStartValue,
-    [property:DefaultValue(100)] int MaxFailedCount,
-    [property:DefaultValue(100)] int SubGrainsCount
-    );
-
 public class Tester
 {
     private Task? _testTask;
-    private Stopwatch _sw;
+    private readonly Stopwatch _sw;
     private readonly string _testHostUrl;
     private readonly ILogger<Tester> _logger;
 
@@ -50,11 +39,12 @@ public class Tester
         object mutex = new();
         long primGrainCounter = req.CounterStartValue;
         long totalActivatedGrains = 0;
-        double subGrainCount = req.SubGrainsCount;
-        TimeSpan lastDuration = TimeSpan.Zero;
+        double subGrainCount = req.SubGrainsCountStart;
 
-        var cycleUpperThreshold = TimeSpan.FromMilliseconds(1000);
-        var cycleLowerThreshold = TimeSpan.FromMilliseconds(950);
+        var cycleUpperThreshold = 1000d / req.TimeOptimizationDivider;
+        var cycleLowerThreshold = 950d / req.TimeOptimizationDivider;
+        
+        ConstantMaxSizeList<double> lastDurations = new(req.Concurrency){ cycleUpperThreshold };
         
         
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
@@ -63,6 +53,8 @@ public class Tester
             int safeSubGrainCount;
             lock (mutex)
             {
+                var lastDuration = lastDurations.Average();
+                
                 if (lastDuration > cycleUpperThreshold)
                 {
                     subGrainCount *= 0.9;
@@ -88,7 +80,7 @@ public class Tester
 
                 lock (mutex)
                 {
-                    lastDuration = sw.Elapsed;
+                    lastDurations.Add(sw.ElapsedMilliseconds);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -96,9 +88,6 @@ public class Tester
                     }
                     
                 }
-                
-                
-                var responseContentBytes = await response.Content.ReadAsByteArrayAsync();
 
                 return response.IsSuccessStatusCode
                     ? Response.Ok(
@@ -115,9 +104,9 @@ public class Tester
         }
 
         var scenario = Scenario.Create("base_scenario", ExecutionMethod)
-            .WithWarmUpDuration(TimeSpan.FromSeconds(5))
-            .WithLoadSimulations(Simulation.RampingInject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromMinutes(req.RampMinutes)))
-            .WithLoadSimulations(Simulation.Inject(rate: req.Rate, interval: TimeSpan.FromSeconds(1), during: TimeSpan.FromMinutes(req.DurationMinutes)))
+            .WithWarmUpDuration(TimeSpan.FromSeconds(req.WarmingUpDurationSeconds))
+            .WithLoadSimulations(Simulation.RampingConstant(copies: req.Concurrency, during: TimeSpan.FromMinutes(req.RampMinutes)))
+            .WithLoadSimulations(Simulation.KeepConstant(copies: req.Concurrency, during: TimeSpan.FromMinutes(req.DurationMinutes)))
             .WithMaxFailCount(req.MaxFailedCount);
 
 
@@ -147,5 +136,3 @@ public class Tester
         return new StateResult($"Tests running for {_sw.Elapsed}");
     }
 }
-
-public record StateResult(string State);
