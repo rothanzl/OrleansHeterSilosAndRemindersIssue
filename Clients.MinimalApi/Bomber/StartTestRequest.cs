@@ -8,7 +8,5 @@ public record StartTestRequest(
     [property:DefaultValue(0)] double RampMinutes, 
     [property:DefaultValue(60)] double DurationMinutes,
     [property:DefaultValue(0)] long CounterStartValue,
-    [property:DefaultValue(100)] int MaxFailedCount,
-    [property:DefaultValue(100)] int SubGrainsCountStart,
-    [property:DefaultValue(1)] int TimeOptimizationDivider
+    [property:DefaultValue(100)] int MaxFailedCount
 );

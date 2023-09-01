@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using NBomber.Contracts;
 using NBomber.CSharp;
 
@@ -39,61 +40,40 @@ public class Tester
         object mutex = new();
         long primGrainCounter = req.CounterStartValue;
         long totalActivatedGrains = 0;
-        double subGrainCount = req.SubGrainsCountStart;
 
-        var cycleUpperThreshold = 1000d / req.TimeOptimizationDivider;
-        var cycleLowerThreshold = 950d / req.TimeOptimizationDivider;
-        
-        ConstantMaxSizeList<double> lastDurations = new(req.Concurrency){ cycleUpperThreshold };
-        
-        
         async Task<IResponse> ExecutionMethod(IScenarioContext context)
         {
             long safePrimGrainCounter;
-            int safeSubGrainCount;
             lock (mutex)
             {
-                var lastDuration = lastDurations.Average();
-                
-                if (lastDuration > cycleUpperThreshold)
-                {
-                    subGrainCount *= 0.9;
-                }else if (lastDuration < cycleLowerThreshold)
-                {
-                    subGrainCount *= 1.1;
-                }
-
-                if (subGrainCount < 1)
-                    subGrainCount = 1;
-                
                 safePrimGrainCounter = primGrainCounter++;
-                safeSubGrainCount = Convert.ToInt32(subGrainCount);
             }
-            
-            _logger.LogInformation("Prim grain {PrimGrain}, sub grains count {Count}", safePrimGrainCounter, safeSubGrainCount);
-            
+
             try
             {
                 Stopwatch sw = Stopwatch.StartNew();
-                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safePrimGrainCounter}/{safeSubGrainCount}");
+                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safePrimGrainCounter}");
                 sw.Stop();
 
-                lock (mutex)
+                int activatedGrains = 0;
+                if (response.IsSuccessStatusCode)
                 {
-                    lastDurations.Add(sw.ElapsedMilliseconds);
+                    var responseBodyString = await response.Content.ReadAsStringAsync();
+                    Int32.TryParse(responseBodyString, NumberStyles.Any, NumberFormatInfo.InvariantInfo, out activatedGrains);
 
-                    if (response.IsSuccessStatusCode)
+                    lock (mutex)
                     {
-                        totalActivatedGrains += safeSubGrainCount + 1;
+                        totalActivatedGrains += activatedGrains;
                     }
-                    
                 }
+
+                _logger.LogInformation("Prim grain {PrimGrain}, activated grains {Count}", safePrimGrainCounter, activatedGrains);
 
                 return response.IsSuccessStatusCode
                     ? Response.Ok(
                         payload: safePrimGrainCounter, 
                         statusCode: response.StatusCode.ToString(), 
-                        sizeBytes: safeSubGrainCount + 1)
+                        sizeBytes: activatedGrains)
                     : Response.Fail(
                         statusCode: response.StatusCode.ToString());
             }

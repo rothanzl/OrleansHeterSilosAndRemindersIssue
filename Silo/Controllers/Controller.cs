@@ -39,16 +39,16 @@ public class Controller : ControllerBase
     }
 
 
-    [HttpGet("hello/{name}/{count}")]
-    public async Task<ActionResult<string>> SayHello([FromRoute] string name, [FromRoute] int count)
+    [HttpGet("hello/{name}")]
+    public async Task<ActionResult<string>> SayHello([FromRoute] string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             return "Name is empty!";
 
-        string hello;
+        int count;
         try
         {
-            hello = await _grainFactory.GetGrain<IHelloGrain>(name).SayHello(count);
+            count = await _grainFactory.GetGrain<IHelloGrain>(name).SayHello(recurent: true);
         }
         catch (Exception e)
         {
@@ -56,7 +56,7 @@ public class Controller : ControllerBase
             throw;
         }
 
-        return Ok(hello);
+        return Ok(count.ToString());
     }
     
 

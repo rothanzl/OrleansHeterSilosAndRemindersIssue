@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using Common.Orleans;
 using Foundation.ObjectHydrator;
 using Silo.Grians.States;
@@ -38,18 +39,26 @@ public class HelloGrain : Grain, IHelloGrain
     }
 
 
-    public async Task<string> SayHello(int subgrainsCount)
+    public async Task<int> SayHello(bool recurent)
     {
+        if (!recurent)
+            return 1;
+        
+        
         var pk = this.GetPrimaryKeyString()!;
 
-        for (int i = 0; i < subgrainsCount; i++)
+        int i = 0;
+        Stopwatch sw = Stopwatch.StartNew();
+        
+        while (true)
         {
-            string subGrainId = pk + "-sg" + i;
-            await GrainFactory.GetGrain<IHelloGrain>(subGrainId).SayHello(0);
+            if (sw.ElapsedMilliseconds >= 1000)
+                break;
+            
+            string subGrainId = pk + "-sg" + (++i);
+            await GrainFactory.GetGrain<IHelloGrain>(subGrainId).SayHello(recurent: false);
         }
         
-        
-        string message = $"Hello from {pk}";
-        return message;
+        return i + 1;
     }
 }
