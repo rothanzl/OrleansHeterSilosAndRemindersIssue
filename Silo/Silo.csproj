@@ -22,7 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Abstractions\Abstractions.csproj" />
     <ProjectReference Include="..\Common.Orleans\Common.Orleans.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="OrleansTelemetry\" />
   </ItemGroup>
 
 </Project>

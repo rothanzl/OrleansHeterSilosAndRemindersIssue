@@ -1,3 +1,4 @@
+using Abstractions;
 using Common.Orleans;
 using Microsoft.Azure.Cosmos;
 using Orleans.Clustering.Cosmos;
@@ -19,7 +20,7 @@ builder
             })
             .Configure<SiloOptions>(options =>
             {
-                options.SiloName = "Silo";
+                options.SiloName = ClusterConf.SiloName;
             })
             .ConfigureEndpoints(siloPort: 11_111, gatewayPort: 30_000);
 

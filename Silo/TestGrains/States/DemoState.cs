@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using Newtonsoft.Json;
 
-namespace Silo.Grians.States;
+namespace Silo.TestGrains.States;
 
 public class DemoState
 {

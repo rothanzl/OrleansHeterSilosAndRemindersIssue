@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Silo.Grians;
+using Silo.TestGrains;
 
 namespace Silo.Controllers;
 
@@ -48,7 +48,7 @@ public class Controller : ControllerBase
         int count;
         try
         {
-            count = await _grainFactory.GetGrain<IHelloGrain>(name).SayHello(recurent: true);
+            count = await _grainFactory.GetGrain<IRecurrentTestGrainInMemory>(name).SayHello(recurent: true);
         }
         catch (Exception e)
         {

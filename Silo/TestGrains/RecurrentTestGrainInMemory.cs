@@ -2,13 +2,13 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using Common.Orleans;
 using Foundation.ObjectHydrator;
-using Silo.Grians.States;
+using Silo.TestGrains.States;
 
-namespace Silo.Grians;
+namespace Silo.TestGrains;
 
 
 [DontPlaceMeOnTheDashboard]
-public class HelloGrain : Grain, IHelloGrain
+public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
 {
     private DemoState State { get; set; } = new();
     
@@ -56,7 +56,7 @@ public class HelloGrain : Grain, IHelloGrain
                 break;
             
             string subGrainId = pk + "-sg" + (++i);
-            await GrainFactory.GetGrain<IHelloGrain>(subGrainId).SayHello(recurent: false);
+            await GrainFactory.GetGrain<IRecurrentTestGrainInMemory>(subGrainId).SayHello(recurent: false);
         }
         
         return i + 1;

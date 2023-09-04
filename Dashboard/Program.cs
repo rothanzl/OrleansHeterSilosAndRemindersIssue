@@ -6,6 +6,8 @@ using Orleans.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
+
 // builder.Services.AddWebAppApplicationInsights("Dashboard");
 builder.Host.UseOrleans((ctx, siloBuilder) =>
 {
@@ -51,6 +53,6 @@ builder.Services.DontHostGrainsHere();
 
 var app = builder.Build();
 
-app.MapGet("/", () => Results.Ok("Dashboard"));
+app.MapControllers();
 
 app.Run();
