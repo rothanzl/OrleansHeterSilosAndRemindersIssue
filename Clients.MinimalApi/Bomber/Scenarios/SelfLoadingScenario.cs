@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Abstractions;
 using NBomber.Contracts;
 using NBomber.CSharp;
 using OrleansDashboard.Model;
@@ -11,6 +10,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     private readonly Task _dashboardTask;
     private bool RunDashboardTask { get; set; }
     private readonly DashboardData _dashboardData;
+    private readonly StartTestRequest _startTestRequest;
 
     public override int ActivatedGrains
     {
@@ -24,8 +24,9 @@ public class SelfLoadingScenario : BaseScenarioMethod
     }
 
 
-    public SelfLoadingScenario(TesterConfig config, ILogger logger) : base(config, logger)
+    public SelfLoadingScenario(TesterConfig config, ILogger logger, StartTestRequest startTestRequest) : base(config, logger)
     {
+        _startTestRequest = startTestRequest;
         RunDashboardTask = true;
         _dashboardData = new();
         _dashboardTask = Task.Run(DashboardTask);
@@ -87,6 +88,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     
     public override async Task<IResponse> Method(IScenarioContext context)
     {
+        int responseLimitMs;
         lock (Mutex)
         {
             if(_dashboardData.AreObsolete)
@@ -94,6 +96,8 @@ public class SelfLoadingScenario : BaseScenarioMethod
             
             if(_dashboardData.ChangedNumberOfSilos)
                 return Response.Fail(statusCode: "ChangedNumberOfSilos"+_dashboardData.NumberOfSilos);
+
+            responseLimitMs = _startTestRequest.ResponseLimitMs;
         }
         
         HttpClient httpClient = GetHttpClient(context);
@@ -104,7 +108,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
         if(!response.IsSuccessStatusCode)
             return Response.Fail(statusCode: response.StatusCode.ToString());
         
-        if(sw.ElapsedMilliseconds > ClusterConfig.SiloRestResponseDelayLimitMs)
+        if(sw.ElapsedMilliseconds > responseLimitMs)
             return Response.Fail(statusCode: "RestApiResponse" + sw.ElapsedMilliseconds);
 
         return Response.Ok(statusCode: response.StatusCode.ToString());
