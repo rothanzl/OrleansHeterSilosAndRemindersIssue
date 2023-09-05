@@ -54,7 +54,8 @@ public class SelfLoadingScenario : BaseScenarioMethod
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError("Dashboard get cluster info response {Code}", response.StatusCode.ToString());
-                    return;
+                    await Task.Delay(1000);
+                    continue;
                 }
 
                 var counters = await response.Content.ReadFromJsonAsync<DashboardCounters>() ??
