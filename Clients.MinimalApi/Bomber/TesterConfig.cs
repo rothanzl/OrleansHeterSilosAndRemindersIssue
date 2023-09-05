@@ -4,8 +4,11 @@ public class TesterConfig
 {
     public TesterConfig(ConfigurationManager configurationManager)
     {
-        TestAppUrl = configurationManager.GetValue<string>("TestAppUrl") ?? "localhost:5000";
-        DashboardUrl = configurationManager.GetValue<string>("DashboardUrl") ?? "localhost:5001";
+        var testAppUrlEnvVar = configurationManager.GetValue<string>("TestAppUrl");
+        var dashboardUrlEvnVar = configurationManager.GetValue<string>("DashboardUrl");
+        
+        TestAppUrl = testAppUrlEnvVar is null ? "https://localhost:5000" : "https://"+testAppUrlEnvVar;
+        DashboardUrl = dashboardUrlEvnVar is null ? "http://localhost:5001" : "https://"+dashboardUrlEvnVar;
     }
     
     public string TestAppUrl { get; }

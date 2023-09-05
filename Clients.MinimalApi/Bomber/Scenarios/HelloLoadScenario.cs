@@ -27,7 +27,7 @@ public class HelloLoadScenario : BaseScenarioMethod
         try
         {
             Stopwatch sw = Stopwatch.StartNew();
-            var response = await httpClient.GetAsync($"https://{_config.TestAppUrl}/hello/I{safePrimGrainCounter}");
+            var response = await httpClient.GetAsync($"{_config.TestAppUrl}/hello/I{safePrimGrainCounter}");
             sw.Stop();
 
             int activatedGrains = 0;

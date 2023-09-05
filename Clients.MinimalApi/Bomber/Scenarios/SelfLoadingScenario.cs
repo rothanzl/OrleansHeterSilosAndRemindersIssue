@@ -24,7 +24,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     {
         using var httpClient = HttpClientFactory();
 
-        var response = await httpClient.PutAsync($"https://{_config.TestAppUrl}/populate/start", null);
+        var response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/start", null);
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError("Error start populate with response {Code}", response.StatusCode.ToString());
@@ -38,7 +38,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
             {
                 sw.Restart();
 
-                response = await httpClient.GetAsync($"https://{_config.DashboardUrl}/cluster");
+                response = await httpClient.GetAsync($"{_config.DashboardUrl}/cluster");
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError("Dashboard get cluster info response {Code}", response.StatusCode.ToString());
@@ -64,7 +64,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
         }
         finally
         {
-            response = await httpClient.PutAsync($"https://{_config.TestAppUrl}/populate/stop", null);
+            response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/stop", null);
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Error stop populate with response {Code}", response.StatusCode.ToString());
@@ -86,7 +86,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
         
         HttpClient httpClient = GetHttpClient(context);
         Stopwatch sw = Stopwatch.StartNew();
-        var response = await httpClient.GetAsync($"https://{_config.TestAppUrl}/");
+        var response = await httpClient.GetAsync($"{_config.TestAppUrl}/");
         sw.Stop();
         
         if(!response.IsSuccessStatusCode)
