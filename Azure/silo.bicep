@@ -13,7 +13,7 @@ param targetIngressPort int = 80
 @secure()
 param registryPassword string
 
-resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' ={
+resource containerApp 'Microsoft.App/containerApps@2023-05-01' ={
   name: name
   location: location
   properties: {
