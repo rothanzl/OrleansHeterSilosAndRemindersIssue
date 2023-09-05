@@ -103,7 +103,7 @@ module dashboard 'dashboard.bicep' = {
     registryPassword: acr.listCredentials().passwords[0].value
     registryUsername: acr.listCredentials().username
     allowExternalIngress: true
-    targetIngressPort: 8080
+    targetIngressPort: 80
     maxReplicas: 1
     envVars : shared_config
   }

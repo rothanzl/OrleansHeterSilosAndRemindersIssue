@@ -62,6 +62,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
                 lock (Mutex)
                 {
                     _dashboardData.Push(counters);
+                    _logger.LogInformation("Activated grains {No}", _dashboardData.ActivatedGrains);
                 }
 
                 sw.Stop();

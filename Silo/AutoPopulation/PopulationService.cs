@@ -1,4 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
 using Silo.TestGrains;
 
 namespace Silo.AutoPopulation;
@@ -9,7 +8,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
     {
         _grainFactory = grainFactory;
         _logger = logger;
-        PopulationTask = Task.CompletedTask;
+        PopulationTasks = Array.Empty<Task>();
         PopulationCycleNumber = 0;
         SiloAddress = silo.SiloAddress.ToString();
     }
@@ -17,7 +16,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
     private string SiloAddress { get; }
     private readonly IGrainFactory _grainFactory;
     private readonly ILogger<PopulationService> _logger;
-    private Task PopulationTask { get; set; }
+    private Task[] PopulationTasks { get; set; }
     private readonly object _mutex = new();
     private bool Populate { get; set; }
     private long PopulationCycleNumber { get; set; }
@@ -25,11 +24,16 @@ public class PopulationService : BackgroundService, IAsyncDisposable
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!PopulationTask.IsCompleted)
+        if (!PopulationTasks.All(t=> t.IsCompleted))
             return;
 
         Populate = true;
-        PopulationTask = Task.Run(PopulateLoop);
+        PopulationTasks = new Task[]
+        {
+            Task.Run(PopulateLoop),
+            Task.Run(PopulateLoop),
+            Task.Run(PopulateLoop),
+        };
     }
 
     private async Task PopulateLoop()
@@ -45,10 +49,13 @@ public class PopulationService : BackgroundService, IAsyncDisposable
                 }
                 else
                 {
+                    string pk;
+                    lock (_mutex)
+                    {
+                        pk = $"{SiloAddress}-{PopulationCycleNumber.ToString()}";
+                        PopulationCycleNumber += 1;
+                    }
 
-                    var pk = $"{SiloAddress}-{PopulationCycleNumber.ToString()}";
-                    PopulationCycleNumber += 1;
-                    
                     var count = await _grainFactory
                         .GetGrain<IRecurrentTestGrainInMemory>(pk)
                         .SayHello(true);
@@ -75,9 +82,13 @@ public class PopulationService : BackgroundService, IAsyncDisposable
             Populate = false;
         }
 
-        try
+        foreach (Task populationTask in PopulationTasks)
         {
-            await PopulationTask;
-        }catch{/* */}
+            try
+            { 
+                await populationTask;
+            }
+            catch{/* */}
+        }
     }
 }
