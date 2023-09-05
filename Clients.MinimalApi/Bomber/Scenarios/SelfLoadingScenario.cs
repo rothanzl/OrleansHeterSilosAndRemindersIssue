@@ -79,6 +79,9 @@ public class SelfLoadingScenario : BaseScenarioMethod
         {
             if(_dashboardData.AreObsolete)
                 return Response.Fail(statusCode: "ObsoleteDashboardData");
+            
+            if(_dashboardData.ChangedNumberOfSilos)
+                return Response.Fail(statusCode: "ChangedNumberOfSilos"+_dashboardData.NumberOfSilos);
         }
         
         HttpClient httpClient = GetHttpClient(context);
