@@ -5,7 +5,7 @@ namespace Clients.MinimalApi.Bomber.Scenarios;
 public abstract class BaseScenarioMethod : IScenarioMethod
 {
     protected object Mutex { get; } = new();
-    public int ActivatedGrains { get; protected set; }
+    public virtual int ActivatedGrains { get; protected set; }
     private List<HttpClient> HttpClients { get; } = new();
     protected readonly TesterConfig _config;
     protected readonly ILogger _logger;

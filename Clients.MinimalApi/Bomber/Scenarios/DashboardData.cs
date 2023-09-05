@@ -11,8 +11,12 @@ public class DashboardData
     private TimeSpan ObsoleteTimeout { get; } = TimeSpan.FromSeconds(30);
     public bool ChangedNumberOfSilos { get; private set; } = false;
     public int NumberOfSilos => Counters.Hosts.Length;
-    
-    
+
+    public int ActivatedGrains => Counters.SimpleGrainStats
+        .Where(g => g.GrainType.Equals("Silo.TestGrains.RecurrentTestGrainInMemory"))
+        .Sum(g => g.ActivationCount);
+
+
     public bool Push(DashboardCounters counters)
     {
         if (ChangedNumberOfSilos)

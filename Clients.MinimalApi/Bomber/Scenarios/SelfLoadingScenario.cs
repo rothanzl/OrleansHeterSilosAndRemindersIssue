@@ -12,6 +12,17 @@ public class SelfLoadingScenario : BaseScenarioMethod
     private bool RunDashboardTask { get; set; }
     private readonly DashboardData _dashboardData;
 
+    public override int ActivatedGrains
+    {
+        get
+        {
+            lock (Mutex)
+            {
+                return _dashboardData.ActivatedGrains;
+            }
+        }
+    }
+
 
     public SelfLoadingScenario(TesterConfig config, ILogger logger) : base(config, logger)
     {
