@@ -12,7 +12,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
         PopulationCycleNumber = 0;
         SiloAddress = silo.SiloAddress.ToString();
     }
-
+    
     private string SiloAddress { get; }
     private readonly IGrainFactory _grainFactory;
     private readonly ILogger<PopulationService> _logger;
@@ -28,12 +28,18 @@ public class PopulationService : BackgroundService, IAsyncDisposable
             return;
 
         Populate = true;
-        PopulationTasks = new Task[]
-        {
-            Task.Run(PopulateLoop),
-            Task.Run(PopulateLoop),
-            Task.Run(PopulateLoop),
-        };
+
+        int parallelism;
+        if (!Int32.TryParse(Environment.GetEnvironmentVariable("POPULATE_PARALLELISM")??"", out parallelism))
+            parallelism = 3;
+        
+        _logger.LogInformation("Population parallelism {P}", parallelism);
+        
+        
+        PopulationTasks = Enumerable
+            .Range(0, parallelism)
+            .Select(_ => Task.Run(PopulateLoop))
+            .ToArray();
     }
 
     private async Task PopulateLoop()
