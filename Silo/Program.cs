@@ -3,6 +3,7 @@ using Common.Orleans;
 using Microsoft.Azure.Cosmos;
 using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
+using Silo.AutoPopulation;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,9 +21,14 @@ builder
             })
             .Configure<SiloOptions>(options =>
             {
-                options.SiloName = ClusterConf.SiloName;
+                options.SiloName = ClusterConfig.SiloName;
             })
-            .ConfigureEndpoints(siloPort: 11_111, gatewayPort: 30_000);
+            .ConfigureEndpoints(siloPort: 11_111, gatewayPort: 30_000)
+            .ConfigureServices(services =>
+            {
+                services.AddHostedService<PopulationService>();
+            })
+            ;
 
         if (cosmosDbKey is { } && cosmosDbUri is { })
         {

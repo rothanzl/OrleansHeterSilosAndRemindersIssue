@@ -1,6 +1,5 @@
 using System.Diagnostics;
-using System.Globalization;
-using NBomber.Contracts;
+using Clients.MinimalApi.Bomber.Scenarios;
 using NBomber.CSharp;
 
 namespace Clients.MinimalApi.Bomber;
@@ -9,12 +8,12 @@ public class Tester
 {
     private Task? _testTask;
     private readonly Stopwatch _sw;
-    private readonly string _testHostUrl;
+    private readonly TesterConfig _config;
     private readonly ILogger<Tester> _logger;
 
-    public Tester(string testHostUrl, ILogger<Tester> logger)
+    public Tester(TesterConfig config, ILogger<Tester> logger)
     {
-        _testHostUrl = testHostUrl;
+        _config = config;
         _logger = logger;
         _sw = new();
     }
@@ -28,63 +27,13 @@ public class Tester
         return new StateResult(State: "Started");
     }
 
-
-    private void StartTests(StartTestRequest req)
+    private async Task StartTests(StartTestRequest req)
     {
         _sw.Restart();
+
+        await using IScenarioMethod scenarioMethod = new SelfLoadingScenario(_config, _logger);
         
-        HttpClientHandler clientHandler = new HttpClientHandler();
-        clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-        using HttpClient httpClient = new(clientHandler);
-
-        object mutex = new();
-        long primGrainCounter = req.CounterStartValue;
-        long totalActivatedGrains = 0;
-
-        async Task<IResponse> ExecutionMethod(IScenarioContext context)
-        {
-            long safePrimGrainCounter;
-            lock (mutex)
-            {
-                safePrimGrainCounter = primGrainCounter++;
-            }
-
-            try
-            {
-                Stopwatch sw = Stopwatch.StartNew();
-                var response = await httpClient.GetAsync($"https://{_testHostUrl}/hello/I{safePrimGrainCounter}");
-                sw.Stop();
-
-                int activatedGrains = 0;
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseBodyString = await response.Content.ReadAsStringAsync();
-                    Int32.TryParse(responseBodyString, NumberStyles.Any, NumberFormatInfo.InvariantInfo, out activatedGrains);
-
-                    lock (mutex)
-                    {
-                        totalActivatedGrains += activatedGrains;
-                    }
-                }
-
-                _logger.LogInformation("Prim grain {PrimGrain}, activated grains {Count}", safePrimGrainCounter, activatedGrains);
-
-                return activatedGrains > 2
-                    ? Response.Ok(
-                        payload: safePrimGrainCounter, 
-                        statusCode: response.StatusCode.ToString(),
-                        message: $"ActivatedGrains-{activatedGrains}")
-                    : Response.Fail(
-                        statusCode: response.StatusCode.ToString(),
-                        message: $"ActivatedGrains-{activatedGrains}");
-            }
-            catch (Exception e)
-            {
-                return Response.Fail(message: e.ToString());
-            }
-        }
-
-        var scenario = Scenario.Create("base_scenario", ExecutionMethod)
+        var scenario = Scenario.Create("base_scenario", scenarioMethod.Method)
             .WithWarmUpDuration(TimeSpan.FromSeconds(req.WarmingUpDurationSeconds))
             .WithLoadSimulations(Simulation.RampingConstant(copies: req.Concurrency, during: TimeSpan.FromMinutes(req.RampMinutes)))
             .WithLoadSimulations(Simulation.KeepConstant(copies: req.Concurrency, during: TimeSpan.FromMinutes(req.DurationMinutes)))
@@ -97,8 +46,9 @@ public class Tester
         
         _sw.Stop();
         
-        _logger.LogWarning("Tester ended with {Count} total activated grains in {Time}", totalActivatedGrains, _sw.Elapsed);
+        _logger.LogWarning("Tester ended with {Count} total activated grains in {Time}", scenarioMethod.ActivatedGrains, _sw.Elapsed);
     }
+
 
     public StateResult State()
     {

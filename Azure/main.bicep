@@ -115,6 +115,10 @@ var minimal_client_config = union(shared_config,
       name: 'TestAppUrl'
       value: silo.outputs.url
     }
+    {
+      name: 'DashboardUrl'
+      value: dashboard.outputs.url
+    }
   ])
 
 module minimalapiclient 'minimalapiclient.bicep' = {

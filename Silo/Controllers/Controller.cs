@@ -1,5 +1,6 @@
-using System.Diagnostics;
+using Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using Silo.AutoPopulation;
 using Silo.TestGrains;
 
 namespace Silo.Controllers;
@@ -11,8 +12,7 @@ public class Controller : ControllerBase
     private readonly IGrainFactory _grainFactory;
     private readonly ILogger<Controller> _logger;
 
-    private static int Counter = 0;
-    private static object CounterMutex = new();
+    
 
     public Controller(IGrainFactory grainFactory, ILogger<Controller> logger)
     {
@@ -24,18 +24,9 @@ public class Controller : ControllerBase
     [HttpGet("/")]
     public async Task<ActionResult<string>> GetIndex()
     {
-        Stopwatch sw = Stopwatch.StartNew();
+        await Task.Delay(ClusterConfig.SiloRestResponseDelayMs);
 
-        int innerCounter;
-        lock (CounterMutex)
-        {
-            Counter += 1;
-            innerCounter = Counter;
-        }
-
-        sw.Stop();
-
-        return Ok($"The success content of {innerCounter} within {sw.Elapsed}");
+        return Ok("Success answer");
     }
 
 
@@ -58,6 +49,18 @@ public class Controller : ControllerBase
 
         return Ok(count.ToString());
     }
-    
 
+    [HttpPut("populate/start")]
+    public async Task<ActionResult> StartPopulate()
+    {
+        await IAutoPopulationConfGrain.GetInstance(_grainFactory).StartPopulation();
+        return Ok();
+    }
+    
+    [HttpPut("populate/stop")]
+    public async Task<ActionResult> StopPopulate()
+    {
+        await IAutoPopulationConfGrain.GetInstance(_grainFactory).StopPopulation();
+        return Ok();
+    }
 }
