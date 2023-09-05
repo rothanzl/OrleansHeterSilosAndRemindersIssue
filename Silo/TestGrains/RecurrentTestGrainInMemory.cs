@@ -2,12 +2,14 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using Common.Orleans;
 using Foundation.ObjectHydrator;
+using Orleans.Placement;
 using Silo.TestGrains.States;
 
 namespace Silo.TestGrains;
 
 
 [DontPlaceMeOnTheDashboard]
+[PreferLocalPlacement]
 public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
 {
     private DemoState State { get; set; } = new();
