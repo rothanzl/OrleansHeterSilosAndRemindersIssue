@@ -62,8 +62,8 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
         if (counters.SystemHosts != expectedSilos)
             return Response.Fail(statusCode: "ErrorExpectedSilos" + counters.SystemHosts.ToString());
-                
-        if(sw.ElapsedMilliseconds > responseLimitMs)
+        
+        if(responseLimitMs > 0 && sw.ElapsedMilliseconds > responseLimitMs)
             return Response.Fail(statusCode: "RestApiResponse" + sw.ElapsedMilliseconds.ToString());
 
         return Response.Ok(statusCode: response.StatusCode.ToString());
