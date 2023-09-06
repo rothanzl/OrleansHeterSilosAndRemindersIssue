@@ -16,6 +16,8 @@ public abstract class BaseScenarioMethod : IScenarioMethod
         _logger = logger;
     }
     
+    public Task Init() => Task.CompletedTask;
+
     public virtual ValueTask DisposeAsync()
     {
         foreach (HttpClient httpClient in HttpClients)

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Abstractions;
 using NBomber.Contracts;
 using NBomber.CSharp;
 using OrleansDashboard.Model;
@@ -7,107 +8,47 @@ namespace Clients.MinimalApi.Bomber.Scenarios;
 
 public class SelfLoadingScenario : BaseScenarioMethod
 {
-    private readonly Task _dashboardTask;
-    private bool RunDashboardTask { get; set; }
-    private readonly DashboardData _dashboardData;
+    
     private readonly StartTestRequest _startTestRequest;
-
-    public override int ActivatedGrains
-    {
-        get
-        {
-            lock (Mutex)
-            {
-                return _dashboardData.ActivatedGrains;
-            }
-        }
-    }
 
 
     public SelfLoadingScenario(TesterConfig config, ILogger logger, StartTestRequest startTestRequest) : base(config, logger)
     {
         _startTestRequest = startTestRequest;
-        RunDashboardTask = true;
-        _dashboardData = new();
-        _dashboardTask = Task.Run(DashboardTask);
     }
 
-    private async Task DashboardTask()
+    public async Task Init()
     {
         using var httpClient = HttpClientFactory();
-
         var response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/start", null);
+        _logger.LogInformation("Start populate with response {Code}", response.StatusCode.ToString());
+        
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("Error start populate with response {Code}", response.StatusCode.ToString());
-            return;
-        }
-        
-        try
-        {
-            Stopwatch sw = new Stopwatch();
-            while (RunDashboardTask)
-            {
-                sw.Restart();
-
-                response = await httpClient.GetAsync($"{_config.DashboardUrl}/cluster");
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogError("Dashboard get cluster info response {Code}", response.StatusCode.ToString());
-                    await Task.Delay(1000);
-                    continue;
-                }
-
-                var counters = await response.Content.ReadFromJsonAsync<DashboardCounters>() ??
-                               throw new NullReferenceException("Cannot deserialize DashboardCounters");
-
-                lock (Mutex)
-                {
-                    _dashboardData.Push(counters);
-                    _logger.LogInformation("Activated grains {No}", _dashboardData.ActivatedGrains);
-                }
-
-                sw.Stop();
-                if (sw.ElapsedMilliseconds < 1000)
-                    await Task.Delay(1000 - Convert.ToInt32(sw.ElapsedMilliseconds));
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error dashboard task");
-        }
-        finally
-        {
-            response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/stop", null);
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError("Error stop populate with response {Code}", response.StatusCode.ToString());
-            }
+            throw new Exception($"Start populate with response {response.StatusCode.ToString()}");
         }
     }
-    
-    
+
     public override async Task<IResponse> Method(IScenarioContext context)
     {
         int responseLimitMs;
-        lock (Mutex)
-        {
-            if(_dashboardData.AreObsolete)
-                return Response.Fail(statusCode: "ObsoleteDashboardData");
-            
-            if(_dashboardData.ChangedNumberOfSilos)
-                return Response.Fail(statusCode: "ChangedNumberOfSilos"+_dashboardData.NumberOfSilos);
-
-            responseLimitMs = _startTestRequest.ResponseLimitMs;
-        }
         
         HttpClient httpClient = GetHttpClient(context);
         Stopwatch sw = Stopwatch.StartNew();
-        var response = await httpClient.GetAsync($"{_config.TestAppUrl}/");
+        var response = await httpClient.GetAsync($"{_config.TestAppUrl}/counters");
         sw.Stop();
         
         if(!response.IsSuccessStatusCode)
             return Response.Fail(statusCode: response.StatusCode.ToString());
+
+
+        var counters = await response.Content.ReadFromJsonAsync<CountersResponse>();
+        
+        lock (Mutex)
+        {
+            responseLimitMs = _startTestRequest.ResponseLimitMs;
+            ActivatedGrains = counters!.ActivatedTestGrainCount;
+        }
         
         if(sw.ElapsedMilliseconds > responseLimitMs)
             return Response.Fail(statusCode: "RestApiResponse" + sw.ElapsedMilliseconds);
@@ -118,8 +59,9 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
     public override async ValueTask DisposeAsync()
     {
-        RunDashboardTask = false;
-        await _dashboardTask;
+        using var httpClient = HttpClientFactory();
+        var response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/stop", null);
+        _logger.LogInformation("Stop populate with response {Code}", response.StatusCode.ToString());
 
         await base.DisposeAsync();
     }

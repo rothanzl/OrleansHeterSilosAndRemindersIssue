@@ -1,5 +1,9 @@
 using Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using Orleans.Runtime;
+using OrleansDashboard;
+using OrleansDashboard.Metrics.TypeFormatting;
+using OrleansDashboard.Model;
 using Silo.AutoPopulation;
 using Silo.TestGrains;
 
@@ -63,4 +67,57 @@ public class Controller : ControllerBase
         await IAutoPopulationConfGrain.GetInstance(_grainFactory).StopPopulation();
         return Ok();
     }
+
+
+    [HttpGet("counters")]
+    public async Task<ActionResult<CountersResponse>> GetCounters()
+    {
+        var metricsGrain = _grainFactory.GetGrain<IManagementGrain>(0);
+        var simpleGrainStats = await  metricsGrain.GetSimpleGrainStatistics();
+        var siloDetails = await metricsGrain.GetDetailedHosts(true);
+
+        var hosts = siloDetails.Select(x => new SiloDetails
+        {
+            FaultZone = x.FaultZone,
+            HostName = x.HostName,
+            IAmAliveTime = x.IAmAliveTime.ToISOString(),
+            ProxyPort = x.ProxyPort,
+            RoleName = x.RoleName,
+            SiloAddress = x.SiloAddress.ToParsableString(),
+            SiloName = x.SiloName,
+            StartTime = x.StartTime.ToISOString(),
+            Status = x.Status.ToString(),
+            SiloStatus = x.Status,
+            UpdateZone = x.UpdateZone
+        }).ToArray();
+
+        var simpleGrainStatsCounters = simpleGrainStats.Select(x =>
+        {
+            var grainName = TypeFormatter.Parse(x.GrainType);
+            var siloAddress = x.SiloAddress.ToParsableString();
+
+            var result = new SimpleGrainStatisticCounter
+            {
+                ActivationCount = x.ActivationCount,
+                GrainType = grainName,
+                SiloAddress = siloAddress,
+                TotalSeconds = default,
+            };
+
+            return result;
+        }).ToArray();
+
+
+        return Ok(new CountersResponse()
+        {
+            SimpleGrainStats = simpleGrainStatsCounters,
+            Hosts = hosts,
+            ActivatedTestGrainCount = simpleGrainStatsCounters
+                .Where(g=> g.GrainType.Equals(typeof(RecurrentTestGrainInMemory).FullName))
+                .Sum(g=>g.ActivationCount),
+            SystemHosts = hosts
+                .Count(h => h.SiloName.Equals(ClusterConfig.SiloName))
+        });
+    }
+
 }

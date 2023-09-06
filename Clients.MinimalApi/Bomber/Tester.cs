@@ -32,6 +32,7 @@ public class Tester
         _sw.Restart();
 
         await using IScenarioMethod scenarioMethod = new SelfLoadingScenario(_config, _logger, req);
+        await scenarioMethod.Init();
         
         var scenario = Scenario.Create("base_scenario", scenarioMethod.Method)
             .WithWarmUpDuration(TimeSpan.FromSeconds(req.WarmingUpDurationSeconds))
