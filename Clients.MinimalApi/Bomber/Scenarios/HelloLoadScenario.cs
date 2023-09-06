@@ -16,7 +16,7 @@ public class HelloLoadScenario : BaseScenarioMethod
 
     public override async Task<IResponse> Method(IScenarioContext context)
     {
-        HttpClient httpClient = GetHttpClient(context);
+        using HttpClient httpClient = HttpClientFactory();
         
         long safePrimGrainCounter;
         lock (Mutex)
@@ -57,5 +57,5 @@ public class HelloLoadScenario : BaseScenarioMethod
         {
             return Response.Fail(message: e.ToString());
         }
-    }
+    } 
 }

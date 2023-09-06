@@ -6,7 +6,6 @@ public abstract class BaseScenarioMethod : IScenarioMethod
 {
     protected object Mutex { get; } = new();
     public virtual int ActivatedGrains { get; protected set; }
-    private List<HttpClient> HttpClients { get; } = new();
     protected readonly TesterConfig _config;
     protected readonly ILogger _logger;
 
@@ -16,15 +15,10 @@ public abstract class BaseScenarioMethod : IScenarioMethod
         _logger = logger;
     }
     
-    public Task Init() => Task.CompletedTask;
+    public virtual Task Init() => Task.CompletedTask;
 
     public virtual ValueTask DisposeAsync()
     {
-        foreach (HttpClient httpClient in HttpClients)
-        {
-            httpClient.Dispose();
-        }
-        
         return ValueTask.CompletedTask;
     }
     
@@ -33,23 +27,6 @@ public abstract class BaseScenarioMethod : IScenarioMethod
         HttpClientHandler clientHandler = new HttpClientHandler();
         clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
         HttpClient httpClient = new(clientHandler);
-        return httpClient;
-    }
-
-    protected HttpClient GetHttpClient(IScenarioContext context)
-    {
-        if (context.Data.TryGetValue("http-client", out var value))
-        {
-            return (HttpClient) value;
-        }
-        
-        HttpClient httpClient = HttpClientFactory();
-        context.Data["http-client"] = httpClient;
-        lock (Mutex)
-        {
-            HttpClients.Add(httpClient);
-        }
-
         return httpClient;
     }
 

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Abstractions;
 using NBomber.Contracts;
 using NBomber.CSharp;
-using OrleansDashboard.Model;
 
 namespace Clients.MinimalApi.Bomber.Scenarios;
 
@@ -17,7 +16,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
         _startTestRequest = startTestRequest;
     }
 
-    public async Task Init()
+    public override async Task Init()
     {
         using var httpClient = HttpClientFactory();
         var response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/start", null);
@@ -31,9 +30,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
     public override async Task<IResponse> Method(IScenarioContext context)
     {
-        int responseLimitMs;
-        
-        HttpClient httpClient = GetHttpClient(context);
+        using HttpClient httpClient = HttpClientFactory();
         Stopwatch sw = Stopwatch.StartNew();
         var response = await httpClient.GetAsync($"{_config.TestAppUrl}/counters");
         sw.Stop();
@@ -43,7 +40,8 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
 
         var counters = await response.Content.ReadFromJsonAsync<CountersResponse>();
-        
+     
+        int responseLimitMs;
         lock (Mutex)
         {
             responseLimitMs = _startTestRequest.ResponseLimitMs;
@@ -56,6 +54,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
         return Response.Ok(statusCode: response.StatusCode.ToString());
     }
 
+    
 
     public override async ValueTask DisposeAsync()
     {
