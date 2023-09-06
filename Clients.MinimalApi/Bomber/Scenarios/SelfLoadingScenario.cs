@@ -9,6 +9,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
 {
     
     private readonly StartTestRequest _startTestRequest;
+    private readonly Stopwatch _loggingSw = new();
 
 
     public SelfLoadingScenario(TesterConfig config, ILogger logger, StartTestRequest startTestRequest) : base(config, logger)
@@ -26,6 +27,8 @@ public class SelfLoadingScenario : BaseScenarioMethod
         {
             throw new Exception($"Start populate with response {response.StatusCode.ToString()}");
         }
+        
+        _loggingSw.Restart();
     }
 
     public override async Task<IResponse> Method(IScenarioContext context)
@@ -41,15 +44,27 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
         var counters = await response.Content.ReadFromJsonAsync<CountersResponse>();
      
-        int responseLimitMs;
+        int responseLimitMs, expectedSilos;
+        bool printLog;
         lock (Mutex)
         {
+            expectedSilos = _startTestRequest.ExpectedSilos;
             responseLimitMs = _startTestRequest.ResponseLimitMs;
             ActivatedGrains = counters!.ActivatedTestGrainCount;
+            printLog = _loggingSw.ElapsedMilliseconds > 2000;
+            if(printLog)
+                _loggingSw.Restart();
         }
         
+        if(printLog)
+            _logger.LogInformation("Created grains {No}", counters.ActivatedTestGrainCount.ToString());
+        
+
+        if (counters.SystemHosts != expectedSilos)
+            return Response.Fail(statusCode: "ErrorExpectedSilos" + counters.SystemHosts.ToString());
+                
         if(sw.ElapsedMilliseconds > responseLimitMs)
-            return Response.Fail(statusCode: "RestApiResponse" + sw.ElapsedMilliseconds);
+            return Response.Fail(statusCode: "RestApiResponse" + sw.ElapsedMilliseconds.ToString());
 
         return Response.Ok(statusCode: response.StatusCode.ToString());
     }
