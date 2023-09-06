@@ -57,7 +57,8 @@ public class SelfLoadingScenario : BaseScenarioMethod
         }
         
         if(printLog)
-            _logger.LogInformation("Created grains {No}", counters.ActivatedTestGrainCount.ToString());
+            _logger.LogInformation("Created grains {No}, last latency {Ms} ms", 
+                counters.ActivatedTestGrainCount.ToString(), sw.ElapsedMilliseconds);
         
 
         if (counters.SystemHosts != expectedSilos)
