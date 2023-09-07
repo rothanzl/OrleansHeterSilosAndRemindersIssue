@@ -3,6 +3,7 @@ using Common.Orleans;
 using Microsoft.Azure.Cosmos;
 using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
+using Orleans.Persistence.Cosmos;
 using Silo.AutoPopulation;
 
 
@@ -39,10 +40,18 @@ builder
                 opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
                 opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
             });
+            siloBuilder.AddCosmosGrainStorageAsDefault((CosmosGrainStorageOptions opt) =>
+            {
+                opt.IsResourceCreationEnabled = true;
+                opt.DatabaseName = CosmosDbConfig.CosmosOrleansDbName;
+                opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
+                opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
+            });
         }
         else
         {
             siloBuilder.UseLocalhostClustering();
+            siloBuilder.AddMemoryGrainStorageAsDefault();
         }
         
     });
