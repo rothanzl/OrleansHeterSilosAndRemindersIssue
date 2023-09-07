@@ -12,7 +12,7 @@ namespace Silo.TestGrains;
 [PreferLocalPlacement]
 public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
 {
-    private DemoState State { get; set; } = new();
+    // private DemoState State { get; set; } = new();
     
     public override Task OnActivateAsync(CancellationToken cancellationToken)
     {
