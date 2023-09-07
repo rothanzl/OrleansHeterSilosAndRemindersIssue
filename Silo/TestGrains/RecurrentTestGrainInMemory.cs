@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Common.Orleans;
 using Foundation.ObjectHydrator;
 using Orleans.Placement;
+using Orleans.Runtime;
 using Silo.TestGrains.States;
 
 namespace Silo.TestGrains;
@@ -12,10 +13,15 @@ namespace Silo.TestGrains;
 [PreferLocalPlacement]
 public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
 {
-    private DemoState State { get; set; } = new();
-    // private string StringState { get; set; } = "";
+    private readonly IPersistentState<DemoState> _persistentState;
+
+    public RecurrentTestGrainInMemory([PersistentState(stateName: "demo-state")] IPersistentState<DemoState> persistentState)
+    {
+        _persistentState = persistentState;
+    }
+
     
-    public override Task OnActivateAsync(CancellationToken cancellationToken)
+    public override async Task OnActivateAsync(CancellationToken cancellationToken)
     {
         var hydrator = new Hydrator<DemoState>()
                 .With(x=>x.Address, new Hydrator<DemoState.LockerAddress>())
@@ -34,13 +40,11 @@ public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
                     .With(x => x.SlotIndexes, new Hydrator<byte>().GetList(10)))
             ;
         
-        State = hydrator.Generate();
-
-        // StringState = string.Join("", Enumerable.Range(0, 1024).Select(_ => '0'));
+        _persistentState.State = hydrator.Generate();
 
         DelayDeactivation(TimeSpan.FromHours(24));
-        
-        return base.OnActivateAsync(cancellationToken);
+
+        await _persistentState.WriteStateAsync();
     }
 
 
