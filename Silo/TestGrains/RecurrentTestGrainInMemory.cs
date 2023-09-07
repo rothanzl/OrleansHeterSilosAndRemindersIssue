@@ -13,6 +13,7 @@ namespace Silo.TestGrains;
 public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
 {
     // private DemoState State { get; set; } = new();
+    private string StringState { get; set; } = "";
     
     public override Task OnActivateAsync(CancellationToken cancellationToken)
     {
@@ -34,7 +35,9 @@ public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
         //     ;
         //
         // State = hydrator.Generate();
-        
+
+        StringState = string.Join("", Enumerable.Range(0, 1024).Select(_ => '0'));
+
         DelayDeactivation(TimeSpan.FromHours(24));
         
         return base.OnActivateAsync(cancellationToken);
