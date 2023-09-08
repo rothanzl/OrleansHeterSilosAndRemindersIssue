@@ -35,6 +35,10 @@ Local placement strategy je krytická. Bez ní je test při výce silech (10 a v
 Testy trvaly cca 10 minut, tedy aktivovat 150,000 grainů trvá při optimálním vytížení 10 minut.
 
 
+### Orleans broadcast channels tests
+
+
+
 
 ## Deploy
 
