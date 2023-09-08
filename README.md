@@ -7,8 +7,8 @@ This project originates from fork of https://github.com/Azure-Samples/Orleans-Cl
 
 Each test is assigned by number and has own branch
 
-1. `test/max-grains` - Max limit grains in silo tests
-2. `test/stream-broadcast` - Orleans broadcast channels tests
+1. `test/01-max-grains` - Max limit grains in silo tests
+2. `test/01-stream-broadcast` - Orleans broadcast channels tests
 
 ### Max limit grains in silo tests
 
