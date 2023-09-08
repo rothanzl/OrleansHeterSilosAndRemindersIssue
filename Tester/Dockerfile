@@ -6,17 +6,17 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Clients.MinimalApi/Clients.MinimalApi.csproj", "Clients.MinimalApi/"]
+COPY ["Tester/Tester.csproj", "Tester/"]
 COPY ["Abstractions/Abstractions.csproj", "Abstractions/"]
-RUN dotnet restore "Clients.MinimalApi/Clients.MinimalApi.csproj"
+RUN dotnet restore "Tester/Tester.csproj"
 COPY . .
-WORKDIR "/src/Clients.MinimalApi"
-RUN dotnet build "Clients.MinimalApi.csproj" -c Release -o /app/build
+WORKDIR "/src/Tester"
+RUN dotnet build "Tester.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Clients.MinimalApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "Tester.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Clients.MinimalApi.dll"]
+ENTRYPOINT ["dotnet", "Tester.dll"]
