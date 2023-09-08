@@ -1,32 +1,32 @@
 namespace Silo.AutoPopulation;
 
-public interface IAutoPopulationConfGrain : IGrainWithIntegerKey
+public interface ITestConfigGrain : IGrainWithIntegerKey
 {
-    public static IAutoPopulationConfGrain GetInstance(IGrainFactory gf) => gf.GetGrain<IAutoPopulationConfGrain>(0);
+    public static ITestConfigGrain GetInstance(IGrainFactory gf) => gf.GetGrain<ITestConfigGrain>(0);
 
-    ValueTask StartPopulation();
-    ValueTask StopPopulation();
-    ValueTask<bool> IsPopulationEnabled();
+    ValueTask Start();
+    ValueTask Stop();
+    ValueTask<bool> IsTestEnabled();
 }
 
-public class AutoPopulationConfGrain : IAutoPopulationConfGrain
+public class TestConfigGrain : ITestConfigGrain
 {
-    private bool PopulationEnabledState { get; set; } = false;
+    private bool TestEnabledState { get; set; } = false;
     
-    public ValueTask StartPopulation()
+    public ValueTask Start()
     {
-        PopulationEnabledState = true;
+        TestEnabledState = true;
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask StopPopulation()
+    public ValueTask Stop()
     {
-        PopulationEnabledState = false;
+        TestEnabledState = false;
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<bool> IsPopulationEnabled()
+    public ValueTask<bool> IsTestEnabled()
     {
-        return ValueTask.FromResult(PopulationEnabledState);
+        return ValueTask.FromResult(TestEnabledState);
     }
 }

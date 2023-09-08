@@ -20,7 +20,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     public override async Task Init()
     {
         using var httpClient = HttpClientFactory();
-        var response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/start", null);
+        var response = await httpClient.PostAsync($"{_config.TestAppUrl}/test/start", null);
         _logger.LogInformation("Start populate with response {Code}", response.StatusCode.ToString());
         
         if (!response.IsSuccessStatusCode)
@@ -75,7 +75,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     public override async ValueTask DisposeAsync()
     {
         using var httpClient = HttpClientFactory();
-        var response = await httpClient.PutAsync($"{_config.TestAppUrl}/populate/stop", null);
+        var response = await httpClient.PostAsync($"{_config.TestAppUrl}/test/stop", null);
         _logger.LogInformation("Stop populate with response {Code}", response.StatusCode.ToString());
 
         await base.DisposeAsync();

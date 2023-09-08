@@ -33,38 +33,17 @@ public class Controller : ControllerBase
         return Ok("Success answer");
     }
 
-
-    [HttpGet("hello/{name}")]
-    public async Task<ActionResult<string>> SayHello([FromRoute] string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            return "Name is empty!";
-
-        int count;
-        try
-        {
-            count = await _grainFactory.GetGrain<IRecurrentTestGrainInMemory>(name).SayHello(recurent: true);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "SayHello error");
-            throw;
-        }
-
-        return Ok(count.ToString());
-    }
-
-    [HttpPut("populate/start")]
+    [HttpPost("test/start")]
     public async Task<ActionResult> StartPopulate()
     {
-        await IAutoPopulationConfGrain.GetInstance(_grainFactory).StartPopulation();
+        await ITestConfigGrain.GetInstance(_grainFactory).Start();
         return Ok();
     }
     
-    [HttpPut("populate/stop")]
+    [HttpPost("test/stop")]
     public async Task<ActionResult> StopPopulate()
     {
-        await IAutoPopulationConfGrain.GetInstance(_grainFactory).StopPopulation();
+        await ITestConfigGrain.GetInstance(_grainFactory).Stop();
         return Ok();
     }
 

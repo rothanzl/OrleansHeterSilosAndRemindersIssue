@@ -49,7 +49,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
         {
             try
             {
-                if (!await IAutoPopulationConfGrain.GetInstance(_grainFactory).IsPopulationEnabled())
+                if (!await ITestConfigGrain.GetInstance(_grainFactory).IsTestEnabled())
                 {
                     await Task.Delay(1000);
                 }

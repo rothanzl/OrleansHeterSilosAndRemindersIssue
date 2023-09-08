@@ -37,7 +37,16 @@ Testy trvaly cca 10 minut, tedy aktivovat 150,000 grainů trvá při optimální
 
 ### Orleans broadcast channels tests
 
+https://learn.microsoft.com/en-us/dotnet/orleans/streaming/broadcast-channel
 
+#### 1. Test
+
+1. Start cluster with 1 silo
+2. Tester enable production to broadcast channel
+3. The producer start producing in one thread in loop 1KB message containing increasing counter.
+4. The consumer checking consistency of increasing counter
+5. Test in loop check state of consumer
+6. Test ended in 10 minutes
 
 
 ## Deploy
