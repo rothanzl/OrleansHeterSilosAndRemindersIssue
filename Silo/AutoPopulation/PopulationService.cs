@@ -53,6 +53,8 @@ public class PopulationService : BackgroundService, IAsyncDisposable
         ChannelId channelId = ChannelId.Create(Constants.NameSpace, Constants.Key);
         IBroadcastChannelWriter<long[]> channelWriter = _provider.GetChannelWriter<long[]>(channelId);
 
+        await _grainFactory.GetGrain<IConsumerGrain>(Constants.Key).GetStats();
+        
         long siloGeneration;
         lock (_mutex)
         {
