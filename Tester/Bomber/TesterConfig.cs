@@ -1,4 +1,4 @@
-namespace Clients.MinimalApi.Bomber;
+namespace Tester.Bomber;
 
 public class TesterConfig
 {

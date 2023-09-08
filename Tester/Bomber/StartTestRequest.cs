@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Clients.MinimalApi.Bomber;
+namespace Tester.Bomber;
 
 public record StartTestRequest(
     [property: DefaultValue(1)] int Concurrency,

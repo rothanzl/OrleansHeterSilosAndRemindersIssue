@@ -1,6 +1,6 @@
 using NBomber.Contracts;
 
-namespace Clients.MinimalApi.Bomber.Scenarios;
+namespace Tester.Bomber.Scenarios;
 
 public interface IScenarioMethod : IAsyncDisposable
 {

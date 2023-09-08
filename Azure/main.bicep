@@ -109,7 +109,7 @@ module dashboard 'dashboard.bicep' = {
   }
 }
 
-var minimal_client_config = union(shared_config, 
+var tester_config = union(shared_config, 
   [
     {
       name: 'TestAppUrl'
@@ -121,11 +121,11 @@ var minimal_client_config = union(shared_config,
     }
   ])
 
-module minimalapiclient 'minimalapiclient.bicep' = {
-  name: 'minimalapiclient'
+module tester 'tester.bicep' = {
+  name: 'tester'
   params: {
     location: location
-    name: 'minimalapiclient'
+    name: 'tester'
     containerAppEnvironmentId: env.outputs.id
     registry: acr.name
     registryPassword: acr.listCredentials().passwords[0].value
@@ -133,7 +133,7 @@ module minimalapiclient 'minimalapiclient.bicep' = {
     allowExternalIngress: true
     targetIngressPort: 80
     maxReplicas: 1
-    envVars : minimal_client_config
+    envVars : tester_config
   }
 }
 

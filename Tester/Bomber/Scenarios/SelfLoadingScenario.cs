@@ -3,7 +3,7 @@ using Abstractions;
 using NBomber.Contracts;
 using NBomber.CSharp;
 
-namespace Clients.MinimalApi.Bomber.Scenarios;
+namespace Tester.Bomber.Scenarios;
 
 public class SelfLoadingScenario : BaseScenarioMethod
 {

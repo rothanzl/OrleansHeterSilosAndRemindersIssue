@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-namespace Clients.MinimalApi;
+namespace Tester;
 
 public class HtmlOutputFormatter : StringOutputFormatter
 {

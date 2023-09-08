@@ -1,15 +1,15 @@
 using System.Web;
-using Clients.MinimalApi.Bomber;
 using Microsoft.AspNetCore.Mvc;
+using Tester.Bomber;
 
-namespace Clients.MinimalApi.Controllers;
+namespace Tester.Controllers;
 
 
 public class ReportController : ControllerBase
 {
-    private readonly Tester _tester;
+    private readonly Bomber.Tester _tester;
 
-    public ReportController(Tester tester)
+    public ReportController(Bomber.Tester tester)
     {
         _tester = tester;
     }

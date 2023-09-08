@@ -1,3 +1,3 @@
-namespace Clients.MinimalApi.Bomber;
+namespace Tester.Bomber;
 
 public record StateResult(string State);

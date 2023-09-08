@@ -8,7 +8,7 @@ on:
 env:
   
   # alphanumeric string under 14 characters
-  RESOURCE_GROUP_NAME: zbox-perf-s1g-08
+  RESOURCE_GROUP_NAME: zbox-perf-s1g-10
 
   # specify your preferred region
   REGION: westeurope
@@ -19,8 +19,8 @@ env:
   DASHBOARD_DOCKER_FILE_PATH: Dashboard/Dockerfile
   DASHBOARD_IMAGE_NAME: dashboard
 
-  MINIMAL_CLIENT_DOCKER_FILE_PATH: Clients.MinimalApi/Dockerfile
-  MINIMAL_CLIENT_IMAGE_NAME: minimalapiclient
+  TESTER_DOCKER_FILE_PATH: Tester/Dockerfile
+  TESTER_IMAGE_NAME: tester
 
   # WORKERSERVICE_CLIENT_DOCKER_FILE_PATH: Clients.WorkerService/Dockerfile
   # WORKERSERVICE_CLIENT_IMAGE_NAME: workerserviceclient
@@ -48,24 +48,24 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    # - name: Create resource group
-    #   uses: azure/CLI@v1
-    #   with:
-    #     inlineScript: >
-    #       echo "Creating resource group in Azure"
-    #       echo "Executing 'az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}'"
+    - name: Create resource group
+      uses: azure/CLI@v1
+      with:
+        inlineScript: >
+          echo "Creating resource group in Azure"
+          echo "Executing 'az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}'"
 
-    #       az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}
+          az group create -l ${{ env.REGION }} -n ${{ env.RESOURCE_GROUP_NAME }}
 
-    # - name: Creating resources
-    #   uses: azure/CLI@v1
-    #   with:
-    #     inlineScript: >
-    #       echo "Creating resources"
+    - name: Creating resources
+      uses: azure/CLI@v1
+      with:
+        inlineScript: >
+          echo "Creating resources"
           
-    #       echo "Executing az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug"
+          echo "Executing az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug"
 
-    #       az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug
+          az deployment group create --resource-group ${{ env.RESOURCE_GROUP_NAME }} --template-file '${{ github.workspace }}/Azure/main.bicep' --debug
 
   build:
     runs-on: ubuntu-latest
@@ -116,12 +116,12 @@ jobs:
         tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ github.sha }}
         file: ${{ env.DASHBOARD_DOCKER_FILE_PATH }}
 
-    - name: Build and push Minimal Client image to registry
+    - name: Build and push Tester image to registry
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.MINIMAL_CLIENT_IMAGE_NAME }}:${{ github.sha }}
-        file: ${{ env.MINIMAL_CLIENT_DOCKER_FILE_PATH }}
+        tags: ${{ env.ACR_LOGIN_SERVER }}/${{ env.TESTER_IMAGE_NAME }}:${{ github.sha }}
+        file: ${{ env.TESTER_DOCKER_FILE_PATH }}
 
     # - name: Build and push Worker Service Client image to registry
     #   uses: docker/build-push-action@v2
@@ -189,15 +189,15 @@ jobs:
 
           az containerapp update -n dashboard -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ github.sha }}
 
-    - name: Deploy Minimal API Client
+    - name: Deploy Tester
       uses: azure/CLI@v1
       with:
         inlineScript: >
-          echo "Deploying Minimal API Client"
+          echo "Deploying Tester"
           
-          az containerapp registry set -n minimalapiclient -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
+          az containerapp registry set -n tester -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
 
-          az containerapp update -n minimalapiclient -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.MINIMAL_CLIENT_IMAGE_NAME }}:${{ github.sha }}
+          az containerapp update -n tester -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.TESTER_IMAGE_NAME }}:${{ github.sha }}
 
     # - name: Deploy Worker Service Client
     #   uses: azure/CLI@v1

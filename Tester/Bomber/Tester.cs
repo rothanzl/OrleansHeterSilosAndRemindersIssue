@@ -1,8 +1,8 @@
 using System.Diagnostics;
-using Clients.MinimalApi.Bomber.Scenarios;
 using NBomber.CSharp;
+using Tester.Bomber.Scenarios;
 
-namespace Clients.MinimalApi.Bomber;
+namespace Tester.Bomber;
 
 public class Tester
 {
