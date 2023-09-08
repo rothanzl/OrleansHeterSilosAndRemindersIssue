@@ -1,4 +1,4 @@
-namespace Common.Orleans;
+namespace Abstractions.OrleansCommon;
 
 public class CosmosDbConfig
 {

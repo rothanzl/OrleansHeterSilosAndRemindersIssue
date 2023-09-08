@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics;
-using Common.Orleans;
+using Abstractions.OrleansCommon;
 using Foundation.ObjectHydrator;
 using Orleans.Placement;
 using Orleans.Runtime;

@@ -2,7 +2,7 @@
 using Orleans.Runtime;
 using Orleans.Runtime.Placement;
 
-namespace Common.Orleans
+namespace Abstractions.OrleansCommon
 {
     public static class DontHostGrainsHereServiceCollectionExtensions
     {

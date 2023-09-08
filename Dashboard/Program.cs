@@ -1,5 +1,4 @@
-
-using Common.Orleans;
+using Abstractions.OrleansCommon;
 using Microsoft.Azure.Cosmos;
 using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
