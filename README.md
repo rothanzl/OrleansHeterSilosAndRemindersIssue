@@ -2,6 +2,8 @@
 
 This project originates from fork of https://github.com/Azure-Samples/Orleans-Cluster-on-Azure-Container-Apps
 
+Login to Azure is ensured by `Managed Identity`.
+
 
 ## Tests
 
