@@ -24,7 +24,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     {
         using var httpClient = HttpClientFactory();
         var response = await httpClient.PostAsync($"{_config.TestAppUrl}/test/start", null);
-        _logger.LogInformation("Start populate with response {Code}", response.StatusCode.ToString());
+        _logger.LogInformation("Start populate with response {@Code}", response.StatusCode.ToString());
         
         if (!response.IsSuccessStatusCode)
         {
@@ -65,7 +65,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
         }
         
         if(printLog)
-            _logger.LogInformation("Last latency {Ms} ms, Channels stats: {Ch}",
+            _logger.LogInformation("Last latency {@Ms} ms, Channels stats: {@Ch}",
                 sw.ElapsedMilliseconds, channelsStats);
         
 

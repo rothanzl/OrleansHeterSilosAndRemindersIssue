@@ -14,7 +14,7 @@ public class ConsumerGrain : Grain, IConsumerGrain, IOnBroadcastChannelSubscribe
     private readonly Dictionary<long, long> _counters = new();
 
 
-    private readonly Dictionary<long, List<Tuple<long, long>>> _inconsistentCounters = new();
+    private readonly Dictionary<long, List<long[]>> _inconsistentCounters = new();
     private readonly List<string> _exceptions = new();
 
     public override Task OnActivateAsync(CancellationToken cancellationToken)
@@ -40,8 +40,8 @@ public class ConsumerGrain : Grain, IConsumerGrain, IOnBroadcastChannelSubscribe
             {
                 if (!_inconsistentCounters.ContainsKey(generation))
                     _inconsistentCounters[generation] = new();
-                
-                _inconsistentCounters[generation].Add(new(prevCounter, counter));
+
+                _inconsistentCounters[generation].Add(new long[] {prevCounter, counter});
             }
         }
         
