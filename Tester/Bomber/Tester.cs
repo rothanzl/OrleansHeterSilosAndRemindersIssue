@@ -46,8 +46,8 @@ public class Tester
             .Run();
         
         _sw.Stop();
-        
-        _logger.LogWarning("Tester ended with {Count} total activated grains in {Time}", scenarioMethod.ActivatedGrains, _sw.Elapsed);
+
+        scenarioMethod.TestEndHook(_sw.Elapsed);
     }
 
 

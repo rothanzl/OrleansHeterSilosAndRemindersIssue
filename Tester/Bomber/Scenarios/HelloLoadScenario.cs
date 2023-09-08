@@ -57,5 +57,12 @@ public class HelloLoadScenario : BaseScenarioMethod
         {
             return Response.Fail(message: e.ToString());
         }
-    } 
+    }
+
+    public override void TestEndHook(TimeSpan testDuration)
+    {
+        _logger.LogWarning("Tester ended with {Count} total activated grains in {Time}", ActivatedGrains, testDuration);
+    }
+
+    private int ActivatedGrains { get; set; }
 }

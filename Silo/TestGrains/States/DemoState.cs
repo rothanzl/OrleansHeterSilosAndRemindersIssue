@@ -9,7 +9,7 @@ public class DemoState
     {
         public int SlotsAffectedCount { get; set; }
 
-        public List<byte> SlotIndexes { get; set; }
+        public List<byte> SlotIndexes { get; set; } = new();
     }
 
     public class LockerInventoryConnector

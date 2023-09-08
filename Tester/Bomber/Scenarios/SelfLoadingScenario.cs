@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Abstractions;
+using Abstractions.BroadcastChannel;
 using NBomber.Contracts;
 using NBomber.CSharp;
 
@@ -10,6 +11,8 @@ public class SelfLoadingScenario : BaseScenarioMethod
     
     private readonly StartTestRequest _startTestRequest;
     private readonly Stopwatch _loggingSw = new();
+
+    private StatsResponse ChannelsStats { get; set; } = new(new(), new(), new());
 
 
     public SelfLoadingScenario(TesterConfig config, ILogger logger, StartTestRequest startTestRequest) : base(config, logger)
@@ -35,30 +38,35 @@ public class SelfLoadingScenario : BaseScenarioMethod
     {
         using HttpClient httpClient = HttpClientFactory();
         Stopwatch sw = Stopwatch.StartNew();
-        var response = await httpClient.GetAsync($"{_config.TestAppUrl}/counters");
+        var countersResponse = await httpClient.GetAsync($"{_config.TestAppUrl}/counters");
+        var channelsStatsResponse = await httpClient.GetAsync($"{_config.TestAppUrl}/broadcast");
         sw.Stop();
         
-        if(!response.IsSuccessStatusCode)
-            return Response.Fail(statusCode: response.StatusCode.ToString());
+        if(!countersResponse.IsSuccessStatusCode)
+            return Response.Fail(statusCode: countersResponse.StatusCode.ToString());
+        
+        if(!channelsStatsResponse.IsSuccessStatusCode)
+            return Response.Fail(statusCode: channelsStatsResponse.StatusCode.ToString());
 
 
-        var counters = await response.Content.ReadFromJsonAsync<CountersResponse>();
-     
+        var counters = await countersResponse.Content.ReadFromJsonAsync<CountersResponse>();
+        var channelsStats = await channelsStatsResponse.Content.ReadFromJsonAsync<StatsResponse>();
+        
         int responseLimitMs, expectedSilos;
         bool printLog;
         lock (Mutex)
         {
             expectedSilos = _startTestRequest.ExpectedSilos;
             responseLimitMs = _startTestRequest.ResponseLimitMs;
-            ActivatedGrains = counters!.ActivatedTestGrainCount;
             printLog = _loggingSw.ElapsedMilliseconds > 2000;
+            ChannelsStats = channelsStats!;
             if(printLog)
                 _loggingSw.Restart();
         }
         
         if(printLog)
-            _logger.LogInformation("Created grains {No}, last latency {Ms} ms", 
-                counters.ActivatedTestGrainCount.ToString(), sw.ElapsedMilliseconds);
+            _logger.LogInformation("Last latency {Ms} ms, Channels stats: {Ch}",
+                sw.ElapsedMilliseconds, channelsStats);
         
 
         if (counters.SystemHosts != expectedSilos)
@@ -67,10 +75,14 @@ public class SelfLoadingScenario : BaseScenarioMethod
         if(responseLimitMs > 0 && sw.ElapsedMilliseconds > responseLimitMs)
             return Response.Fail(statusCode: "RestApiResponse" + sw.ElapsedMilliseconds.ToString());
 
-        return Response.Ok(statusCode: response.StatusCode.ToString());
+        return Response.Ok(statusCode: countersResponse.StatusCode.ToString());
     }
 
-    
+    public override void TestEndHook(TimeSpan testDuration)
+    {
+        _logger.LogWarning("Test durations {Sw}, channel stats: {Ch}", testDuration, ChannelsStats);
+    }
+
 
     public override async ValueTask DisposeAsync()
     {

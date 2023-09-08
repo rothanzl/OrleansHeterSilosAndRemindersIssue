@@ -48,6 +48,10 @@ https://learn.microsoft.com/en-us/dotnet/orleans/streaming/broadcast-channel
 5. Test in loop check state of consumer
 6. Test ended in 10 minutes
 
+#### 2. Test
+
+Produce faster than consume, measure when it failed.
+
 
 ## Deploy
 
@@ -84,5 +88,11 @@ Shared library.
 ### Cannot deploy due to credentials
 
 This error happened almost any time when had been created new resources in Azure.
+
+
+    ERROR: Failed to retrieve credentials for container registry. Please provide the registry username and passwor
+    Error: Error: az cli script failed.
+
+
 
 The solution is to retry `deploy` job until pass. (retry about 5 times)

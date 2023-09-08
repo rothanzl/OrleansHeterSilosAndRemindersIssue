@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.BroadcastChannel" Version="7.2.1" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="7.2.1" />
     <PackageReference Include="Microsoft.Orleans.Clustering.Cosmos" Version="7.2.1" />
     <PackageReference Include="Microsoft.Orleans.Persistence.Cosmos" Version="7.2.1" />

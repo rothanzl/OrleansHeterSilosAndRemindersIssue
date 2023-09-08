@@ -1,3 +1,4 @@
+using Serilog;
 using Tester;
 using Tester.Bomber;
 
@@ -10,7 +11,7 @@ builder.Services.AddMvc(options => options.OutputFormatters.Add(new HtmlOutputFo
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Host.UseSerilog();
 
 builder.Services.AddSingleton(sp => new Tester.Bomber.Tester(new TesterConfig(builder.Configuration), sp.GetRequiredService<ILogger<Tester.Bomber.Tester>>()));
 // builder.Services.AddWebAppApplicationInsights("Minimal API Client");

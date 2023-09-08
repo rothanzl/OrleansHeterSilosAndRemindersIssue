@@ -5,7 +5,6 @@ namespace Tester.Bomber.Scenarios;
 public abstract class BaseScenarioMethod : IScenarioMethod
 {
     protected object Mutex { get; } = new();
-    public virtual int ActivatedGrains { get; protected set; }
     protected readonly TesterConfig _config;
     protected readonly ILogger _logger;
 
@@ -31,4 +30,5 @@ public abstract class BaseScenarioMethod : IScenarioMethod
     }
 
     public abstract Task<IResponse> Method(IScenarioContext context);
+    public abstract void TestEndHook(TimeSpan testDuration);
 }
