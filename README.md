@@ -50,6 +50,24 @@ https://learn.microsoft.com/en-us/dotnet/orleans/streaming/broadcast-channel
 5. Test in loop check state of consumer
 6. Test ended in 10 minutes
 
+##### Results
+
+1. Pořadí doručení zpráv není zaručeno. Pokud je již grain aktivován v době produkování, je pořadí vždy v pořádku. 
+Pokud nění konzumer v době publikování aktivován a jdou dvě zprávy přímo po sobě, často je jejich pořadí obráceně.
+2. Konzumace zpráv je jednovláknová a čeká se na dokončení konzumace zprávy před startem další metody 
+(konzumace zprávy z broadcast kanálu nebo požadavek na rozhraní grainu).
+3. Požadavky na rozhranní grainu jsou řazeny za již čakající zprávy. Pokud je konzumer zahlcen nezpracovanými zprávami, 
+požadavky jsou pozdržen dokud se fronta nezpracuje. 
+4. Test pozastavení konzumace a přetečení fronty. Fronta přetekla při velikosti 96512 o velikosti zprávy 21KB.
+Při přetečení fronty se producer nedozví, že se zpráva nepovedla doručit.
+
+
+Producer
+98090
+Consumer
+1578
+
+
 #### 2. Test
 
 Produce faster than consume, measure when it failed.
