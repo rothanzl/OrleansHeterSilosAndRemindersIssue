@@ -13,12 +13,11 @@ public class PopulationService : BackgroundService, IAsyncDisposable
         
         PopulationTasks = Array.Empty<Task>();
         PopulationCycleNumber = 0;
-        SiloAddress = silo.SiloAddress.ToString();
-        SiloGeneration = silo.SiloAddress.Generation;
+        
+        SiloIpAddressIdentifier = Int64.Parse(silo.SiloAddress.Endpoint.Address.ToString().Replace(".",""));
     }
     
-    private int SiloGeneration { get; }
-    private string SiloAddress { get; }
+    private long SiloIpAddressIdentifier { get; }
     private readonly IGrainFactory _grainFactory;
     private readonly ILogger<PopulationService> _logger;
     private readonly IBroadcastChannelProvider _provider;
@@ -55,10 +54,10 @@ public class PopulationService : BackgroundService, IAsyncDisposable
 
         await _grainFactory.GetGrain<IConsumerGrain>(Constants.Key).GetStats();
         
-        long siloGeneration;
+        long siloId;
         lock (_mutex)
         {
-            siloGeneration = SiloGeneration;
+            siloId = SiloIpAddressIdentifier;
         }
 
         bool populate = true;
@@ -79,7 +78,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
                         PopulationCycleNumber += 1;
                     }
 
-                    var payload = CreatePayload(siloGeneration, counter);
+                    var payload = CreatePayload(siloId, counter);
                     await channelWriter.Publish(payload);
                 }
                 
