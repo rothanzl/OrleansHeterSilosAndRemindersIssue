@@ -81,6 +81,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
 
                     var payload = CreatePayload(siloId, counter);
                     await channelWriter.Publish(payload);
+                    await _grainFactory.GetGrain<IStatsGrain>(Constants.Key).SetProducerCounter(counter);
                 }
                 
                 lock (_mutex)

@@ -5,5 +5,6 @@ namespace Silo.BroadcastChannel;
 public interface IStatsGrain : IGrainWithStringKey
 {
     ValueTask<StatsResponse> GetStats();
-    ValueTask SetStats(StatsResponse stats);
+    ValueTask SetStats(Dictionary<long, long> counters, Dictionary<long, List<long[]>> inconsistentCounters, List<string> exceptions);
+    ValueTask SetProducerCounter(long no);
 }

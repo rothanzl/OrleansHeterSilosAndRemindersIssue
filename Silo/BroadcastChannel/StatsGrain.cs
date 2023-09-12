@@ -4,8 +4,13 @@ namespace Silo.BroadcastChannel;
 
 public class StatsGrain : Grain, IStatsGrain
 {
-    private StatsResponse Stats { get; set; } = StatsResponse.Empty;
+    
     private readonly ILogger<StatsGrain> _logger;
+    
+    private Dictionary<long, long> Counters { get; set; } = new();
+    private Dictionary<long, List<long[]>> InconsistentCounters { get; set; } = new();
+    private List<string> Exceptions { get; set; } = new();
+    private long ProducerCounter { get; set; } = 0;
 
     public StatsGrain(ILogger<StatsGrain> logger)
     {
@@ -14,15 +19,25 @@ public class StatsGrain : Grain, IStatsGrain
 
     public ValueTask<StatsResponse> GetStats()
     {
-        return ValueTask.FromResult(Stats);
+        var stats = new StatsResponse(ProducerCounter, Counters, InconsistentCounters, Exceptions);
+        return ValueTask.FromResult(stats);
     }
 
-    public ValueTask SetStats(StatsResponse stats)
+    public ValueTask SetStats(Dictionary<long, long> counters, 
+        Dictionary<long, List<long[]>> inconsistentCounters,
+        List<string> exceptions)
     {
-        Stats = stats;
+        Counters = counters;
+        InconsistentCounters = inconsistentCounters;
+        Exceptions = exceptions;
         
-        _logger.LogInformation("Got stats: {S}", Stats.ToString());
         
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask SetProducerCounter(long no)
+    {
+        ProducerCounter = no;
         return ValueTask.CompletedTask;
     }
 }

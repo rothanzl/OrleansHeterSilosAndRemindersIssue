@@ -179,16 +179,6 @@ jobs:
 
           az containerapp update -n silo -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.SILO_IMAGE_NAME }}:${{ github.sha }}
 
-    - name: Deploy Dashboard
-      uses: azure/CLI@v1
-      with:
-        inlineScript: >
-          echo "Deploying Dashboard"
-          
-          az containerapp registry set -n dashboard -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
-
-          az containerapp update -n dashboard -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ github.sha }}
-
     - name: Deploy Tester
       uses: azure/CLI@v1
       with:
@@ -198,6 +188,16 @@ jobs:
           az containerapp registry set -n tester -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
 
           az containerapp update -n tester -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.TESTER_IMAGE_NAME }}:${{ github.sha }}
+
+    - name: Deploy Dashboard
+      uses: azure/CLI@v1
+      with:
+        inlineScript: >
+          echo "Deploying Dashboard"
+          
+          az containerapp registry set -n dashboard -g ${{ env.RESOURCE_GROUP_NAME }} --server ${{ env.ACR_LOGIN_SERVER }}
+
+          az containerapp update -n dashboard -g ${{ env.RESOURCE_GROUP_NAME }} -i ${{ env.ACR_LOGIN_SERVER }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ github.sha }}
 
     # - name: Deploy Worker Service Client
     #   uses: azure/CLI@v1

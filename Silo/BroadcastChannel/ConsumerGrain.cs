@@ -1,4 +1,3 @@
-using Abstractions.BroadcastChannel;
 using Orleans.BroadcastChannel;
 
 namespace Silo.BroadcastChannel;
@@ -7,8 +6,6 @@ namespace Silo.BroadcastChannel;
 public class ConsumerGrain : Grain, IConsumerGrain, IOnBroadcastChannelSubscribed
 {
     private readonly Dictionary<long, long> _counters = new();
-
-
     private readonly Dictionary<long, List<long[]>> _inconsistentCounters = new();
     private readonly List<string> _exceptions = new();
 
@@ -45,9 +42,7 @@ public class ConsumerGrain : Grain, IConsumerGrain, IOnBroadcastChannelSubscribe
         _counters[generation] = counter;
         
         
-        // Publish stats
-        var stats = new StatsResponse(_counters, _inconsistentCounters, _exceptions);
-        await GrainFactory.GetGrain<IStatsGrain>(this.GetPrimaryKeyString()).SetStats(stats);
+        await GrainFactory.GetGrain<IStatsGrain>(this.GetPrimaryKeyString()).SetStats(_counters, _inconsistentCounters, _exceptions);
     }
 
     private Task OnError(Exception exception)
