@@ -1,4 +1,4 @@
-using Silo.TestGrains;
+using Silo.Reminders;
 
 namespace Silo.AutoPopulation;
 
@@ -51,9 +51,11 @@ public class PopulationService : BackgroundService, IAsyncDisposable
     private async Task PopulateLoop()
     {
         long siloId;
+        int populationLimit;
         lock (_mutex)
         {
             siloId = SiloIpAddressIdentifier;
+            populationLimit = _populationLimit;
         }
 
         bool populate = true;
@@ -61,25 +63,24 @@ public class PopulationService : BackgroundService, IAsyncDisposable
         {
             try
             {
-                if (!await ITestConfigGrain.GetInstance(_grainFactory).IsTestEnabled())
+                long counter;
+                lock (_mutex)
+                {
+                    counter = PopulationCycleNumber;
+                }
+                
+                if (!await ITestConfigGrain.GetInstance(_grainFactory).IsTestEnabled() || counter >= populationLimit)
                 {
                     await Task.Delay(1000);
                 }
                 else
                 {
-                    long counter;
                     lock (_mutex)
                     {
-                        counter = PopulationCycleNumber;
                         PopulationCycleNumber += 1;
                     }
-
                     
-                    _grainFactory.GetGrain<IRecurrentTestGrainInMemory>()
-                    
-                    var payload = CreatePayload(siloId, counter);
-                    await channelWriter.Publish(payload);
-                    await _grainFactory.GetGrain<IStatsGrain>(Constants.Key).SetProducerCounter(counter);
+                    await _grainFactory.GetGrain<IRemindGrain>($"{siloId}-{counter}").Init();
                 }
                 
                 lock (_mutex)
