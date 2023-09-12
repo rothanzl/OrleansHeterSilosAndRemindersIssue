@@ -6,6 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
 using Orleans.Persistence.Cosmos;
+using Orleans.Reminders.Cosmos;
 using Silo.AutoPopulation;
 
 
@@ -42,6 +43,15 @@ builder
                 opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
                 opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
             });
+            
+            siloBuilder.UseCosmosReminderService((CosmosReminderTableOptions opt) =>
+                {
+                    opt.IsResourceCreationEnabled = true;
+                    opt.DatabaseName = CosmosDbConfig.CosmosOrleansDbName;
+                    opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
+                    opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
+                });
+            
             siloBuilder.AddCosmosGrainStorageAsDefault((CosmosGrainStorageOptions opt) =>
             {
                 opt.IsResourceCreationEnabled = true;
@@ -54,6 +64,7 @@ builder
         {
             siloBuilder.UseLocalhostClustering();
             siloBuilder.AddMemoryGrainStorageAsDefault();
+            siloBuilder.UseInMemoryReminderService();
         }
         
     });
