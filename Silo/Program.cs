@@ -1,11 +1,14 @@
 using Abstractions;
 using Abstractions.OrleansCommon;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
 using Orleans.Persistence.Cosmos;
 using Silo.AutoPopulation;
 using Silo.BroadcastChannel;
+using Silo.Controllers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +61,8 @@ builder
         
     });
 
+builder.Services.AddHealthChecks()
+    .AddCheck<StatsHealthCheck>("broadcast-stats");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -68,7 +73,33 @@ builder.Services.DontHostGrainsHere();
 
 var app = builder.Build();
 app.MapControllers();
-
+app.MapHealthChecks("/health", new HealthCheckOptions()
+{
+    ResponseWriter = (context, report) =>
+    {
+        string json = System.Text.Json.JsonSerializer.Serialize(
+            new
+            {
+                Status = report.Status.ToString(),
+                Duration = report.TotalDuration,
+                Info = report.Entries
+                    .Select(e =>
+                        new
+                        {
+                            Key = e.Key,
+                            Description = e.Value.Description,
+                            Duration = e.Value.Duration,
+                            Status = Enum.GetName(
+                                typeof(HealthStatus),
+                                e.Value.Status),
+                            Error = e.Value.Exception?.Message,
+                            Data = e.Value.Data
+                        })
+                    .ToList()
+            });
+        return context.Response.WriteAsync(json);
+    }
+});
 
 
 // app.MapGet("/", () => Results.Ok("Silo"));

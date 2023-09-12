@@ -3,34 +3,6 @@ using Orleans.BroadcastChannel;
 
 namespace Silo.BroadcastChannel;
 
-public interface IStatsGrain : IGrainWithStringKey
-{
-    ValueTask<StatsResponse> GetStats();
-    ValueTask SetStats(StatsResponse stats);
-}
-
-public class StatsGrain : Grain, IStatsGrain
-{
-    private StatsResponse Stats { get; set; } = StatsResponse.Empty;
-
-    public ValueTask<StatsResponse> GetStats()
-    {
-        return ValueTask.FromResult(Stats);
-    }
-
-    public ValueTask SetStats(StatsResponse stats)
-    {
-        Stats = stats;
-        return ValueTask.CompletedTask;
-    }
-}
-
-
-public interface IConsumerGrain : IGrainWithStringKey
-{
-    ValueTask Activate();
-}
-
 [ImplicitChannelSubscription]
 public class ConsumerGrain : Grain, IConsumerGrain, IOnBroadcastChannelSubscribed
 {

@@ -52,10 +52,11 @@ public class Controller : ControllerBase
     [HttpGet("broadcast")]
     public async Task<ActionResult<StatsResponse>> GetBroadcastStats()
     {
-        var grain = _grainFactory.GetGrain<IStatsGrain>(Constants.Key);
-        var stats = await grain.GetStats();
+        var stats = await GetStats(_grainFactory);
         return Ok(stats);
     }
+
+    public static ValueTask<StatsResponse> GetStats(IGrainFactory grainFactory) => grainFactory.GetGrain<IStatsGrain>(Constants.Key).GetStats();
 
 
     [HttpGet("counters")]
