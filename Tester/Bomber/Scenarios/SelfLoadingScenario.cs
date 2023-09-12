@@ -49,8 +49,10 @@ public class SelfLoadingScenario : BaseScenarioMethod
             return Response.Fail(statusCode: channelsStatsResponse.StatusCode.ToString());
 
 
-        var counters = await countersResponse.Content.ReadFromJsonAsync<CountersResponse>();
-        var channelsStats = await channelsStatsResponse.Content.ReadFromJsonAsync<StatsResponse>();
+        var counters = await countersResponse.Content.ReadFromJsonAsync<CountersResponse>()
+            ?? throw new NullReferenceException("Cannot deserialize CountersResponse");
+        var channelsStats = await channelsStatsResponse.Content.ReadFromJsonAsync<StatsResponse>()
+            ?? throw new NullReferenceException("Cannot deserialize StatsResponse");
         
         int responseLimitMs, expectedSilos;
         bool printLog;
@@ -59,15 +61,22 @@ public class SelfLoadingScenario : BaseScenarioMethod
             expectedSilos = _startTestRequest.ExpectedSilos;
             responseLimitMs = _startTestRequest.ResponseLimitMs;
             printLog = _loggingSw.ElapsedMilliseconds > 2000;
-            ChannelsStats = channelsStats!;
+
+            if(!(channelsStats.InconsistentCounters.Count == 0 && ChannelsStats.InconsistentCounters.Any()))
+            {
+                ChannelsStats = channelsStats;
+            }
+            
             if(printLog)
                 _loggingSw.Restart();
         }
         
         if(printLog)
             _logger.LogInformation("Last latency {@Ms} ms, Channels stats: {@Ch}",
-                sw.ElapsedMilliseconds, channelsStats);
-        
+                sw.ElapsedMilliseconds.ToString(), channelsStats);
+
+        if (channelsStats.InconsistentCounters.Any())
+            return Response.Fail(statusCode: "InconsistentCounters", message: channelsStats.ToString());
 
         if (counters.SystemHosts != expectedSilos)
             return Response.Fail(statusCode: "ErrorExpectedSilos" + counters.SystemHosts.ToString());

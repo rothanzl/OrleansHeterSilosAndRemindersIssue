@@ -29,11 +29,13 @@ public class ConsumerGrain : Grain, IConsumerGrain, IOnBroadcastChannelSubscribe
         streamSubscription.Attach<long[]>(OnUpdated, OnError);
     
 
-    private Task OnUpdated(long[] payload)
+    private async Task OnUpdated(long[] payload)
     {
         var generation = payload[0];
         var counter = payload[1];
 
+        await Task.Delay(500);
+        
         if (_counters.TryGetValue(generation, out var prevCounter))
         {
             if (prevCounter + 1 != counter)
@@ -46,7 +48,6 @@ public class ConsumerGrain : Grain, IConsumerGrain, IOnBroadcastChannelSubscribe
         }
         
         _counters[generation] = counter;
-        return Task.CompletedTask;
     }
 
     private Task OnError(Exception exception)
