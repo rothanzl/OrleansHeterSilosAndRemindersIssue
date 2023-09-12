@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Newtonsoft.Json;
 using Orleans.Runtime;
 using Silo.TestGrains.States;
@@ -12,7 +13,14 @@ public interface IRemindGrain : IGrainWithStringKey
 
 public class RemindGrain : Grain, IRemindGrain, IRemindable
 {
-    
+    private ShipmentDemoState State { get; set; } = new();
+    private readonly ILogger<RemindGrain> _logger;
+
+    public RemindGrain(ILogger<RemindGrain> logger)
+    {
+        _logger = logger;
+    }
+
     public Task ReceiveReminder(string reminderName, TickStatus status)
     {
         return Task.Delay(2000);
@@ -20,6 +28,8 @@ public class RemindGrain : Grain, IRemindGrain, IRemindable
 
     public async ValueTask Init()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+        
         string json = @"{
             'Id': 123456789,
             'TenantId': '00000000-0000-0000-0000-000000000000',
@@ -65,7 +75,14 @@ public class RemindGrain : Grain, IRemindGrain, IRemindable
             'DestinationLockerExternalId': 'DestinationLockerExternalIdValue'
         }";
 
-        ShipmentDemoState shipment = JsonConvert.DeserializeObject<ShipmentDemoState>(json);
-       await this.RegisterOrUpdateReminder("shipmentState", TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+        State = JsonConvert.DeserializeObject<ShipmentDemoState>(json)!;
+        var msDeserialize = sw.ElapsedMilliseconds;
+        sw.Restart();
+        
+        await this.RegisterOrUpdateReminder("shipmentState", TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+        var msRegisterOrUpdateReminder = sw.ElapsedMilliseconds;
+        
+        _logger.LogInformation("Init deserialize {D}ms, reminder {R}ms", 
+            msDeserialize.ToString(), msRegisterOrUpdateReminder.ToString());
     }
 }
