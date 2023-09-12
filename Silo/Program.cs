@@ -7,8 +7,6 @@ using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
 using Orleans.Persistence.Cosmos;
 using Silo.AutoPopulation;
-using Silo.BroadcastChannel;
-using Silo.Controllers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +31,6 @@ builder
             {
                 services.AddHostedService<PopulationService>();
             })
-            .AddBroadcastChannel(Constants.NameSpace)
             ;
 
         if (cosmosDbKey is { } && cosmosDbUri is { })
@@ -61,8 +58,7 @@ builder
         
     });
 
-builder.Services.AddHealthChecks()
-    .AddCheck<StatsHealthCheck>("broadcast-stats");
+builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

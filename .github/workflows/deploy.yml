@@ -10,7 +10,7 @@ on:
 env:
   
   # alphanumeric string under 14 characters
-  RESOURCE_GROUP_NAME: zbox-perf-template
+  RESOURCE_GROUP_NAME: zbox-perf-remind-01
 
   # specify your preferred region
   REGION: westeurope

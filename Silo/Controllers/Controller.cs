@@ -1,12 +1,10 @@
 using Abstractions;
-using Abstractions.BroadcastChannel;
 using Microsoft.AspNetCore.Mvc;
 using Orleans.Runtime;
 using OrleansDashboard;
 using OrleansDashboard.Metrics.TypeFormatting;
 using OrleansDashboard.Model;
 using Silo.AutoPopulation;
-using Silo.BroadcastChannel;
 using Silo.TestGrains;
 
 namespace Silo.Controllers;
@@ -38,27 +36,18 @@ public class Controller : ControllerBase
     [HttpPost("test/start")]
     public async Task<ActionResult> StartTest()
     {
-        Start the test
-        
+        await ITestConfigGrain.GetInstance(_grainFactory).Start();
         return Ok();
     }
     
     [HttpPost("test/stop")]
     public async Task<ActionResult> StopTest()
     {
-        Stop the test
-        
+        await ITestConfigGrain.GetInstance(_grainFactory).Stop();
         return Ok();
     }
 
-    [HttpGet("broadcast")]
-    public async Task<ActionResult<StatsResponse>> GetBroadcastStats()
-    {
-        var stats = await GetStats(_grainFactory);
-        return Ok(stats);
-    }
-
-    public static ValueTask<StatsResponse> GetStats(IGrainFactory grainFactory) => grainFactory.GetGrain<IStatsGrain>(Constants.Key).GetStats();
+    
 
 
     [HttpGet("counters")]

@@ -19,9 +19,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     }
 
     public override async Task Init()
-    {
-        TODO - Before test starts
-            
+    {    
         _totalSw.Restart();
         using var httpClient = HttpClientFactory();
         var response = await httpClient.PostAsync($"{_config.TestAppUrl}/test/start", null);
@@ -44,12 +42,9 @@ public class SelfLoadingScenario : BaseScenarioMethod
         
         if(!countersResponse.IsSuccessStatusCode)
             return Response.Fail(statusCode: countersResponse.StatusCode.ToString());
-        
-        Do the test loop
-
 
         var counters = await countersResponse.Content.ReadFromJsonAsync<CountersResponse>()
-            ?? throw new NullReferenceException("Cannot deserialize CountersResponse");
+                       ?? throw new NullReferenceException("Cannot deserialize CountersResponse");
         
         int responseLimitMs, expectedSilos;
         bool printLog;
@@ -78,16 +73,12 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
     public override void TestEndHook(TimeSpan testDuration)
     {
-        Log at the end of the test
-        
         _logger.LogWarning("Test durations {Sw}", testDuration);
     }
 
 
     public override async ValueTask DisposeAsync()
     {
-        Stop the test
-        
         using var httpClient = HttpClientFactory();
         var response = await httpClient.PostAsync($"{_config.TestAppUrl}/test/stop", null);
         _logger.LogInformation("Stop populate with response {Code}", response.StatusCode.ToString());

@@ -1,5 +1,4 @@
-using Orleans.BroadcastChannel;
-using Silo.BroadcastChannel;
+using Silo.TestGrains;
 
 namespace Silo.AutoPopulation;
 
@@ -9,7 +8,6 @@ public class PopulationService : BackgroundService, IAsyncDisposable
     {
         _grainFactory = grainFactory;
         _logger = logger;
-        _provider = clusterClient.GetBroadcastChannelProvider(Constants.NameSpace);
         
         PopulationTasks = Array.Empty<Task>();
         PopulationCycleNumber = 0;
@@ -20,12 +18,11 @@ public class PopulationService : BackgroundService, IAsyncDisposable
     private long SiloIpAddressIdentifier { get; }
     private readonly IGrainFactory _grainFactory;
     private readonly ILogger<PopulationService> _logger;
-    private readonly IBroadcastChannelProvider _provider;
     private Task[] PopulationTasks { get; set; }
     private readonly object _mutex = new();
     private bool Populate { get; set; }
     private long PopulationCycleNumber { get; set; }
-    
+    private int _populationLimit;
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -36,7 +33,11 @@ public class PopulationService : BackgroundService, IAsyncDisposable
 
         int parallelism;
         if (!Int32.TryParse(Environment.GetEnvironmentVariable("POPULATE_PARALLELISM")??"", out parallelism))
-            parallelism = 1;
+            parallelism = 10;
+
+        
+        if (!Int32.TryParse(Environment.GetEnvironmentVariable("POPULATE_LIMIT")??"", out _populationLimit))
+            _populationLimit = 150_000;
         
         _logger.LogInformation("Population parallelism {P}", parallelism);
         
@@ -49,12 +50,6 @@ public class PopulationService : BackgroundService, IAsyncDisposable
 
     private async Task PopulateLoop()
     {
-        ChannelId channelId = ChannelId.Create(Constants.NameSpace, Constants.Key);
-        IBroadcastChannelWriter<long[]> channelWriter = _provider.GetChannelWriter<long[]>(channelId);
-
-        // Activate consumer grain before publishing
-        await _grainFactory.GetGrain<IConsumerGrain>(Constants.Key).Activate();
-        
         long siloId;
         lock (_mutex)
         {
@@ -79,6 +74,9 @@ public class PopulationService : BackgroundService, IAsyncDisposable
                         PopulationCycleNumber += 1;
                     }
 
+                    
+                    _grainFactory.GetGrain<IRecurrentTestGrainInMemory>()
+                    
                     var payload = CreatePayload(siloId, counter);
                     await channelWriter.Publish(payload);
                     await _grainFactory.GetGrain<IStatsGrain>(Constants.Key).SetProducerCounter(counter);
@@ -97,7 +95,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
         }
     }
 
-    private static long[] CreatePayload(long firstElement, long otherElemetns, int sizeInKyloBytes = 21)
+    public static long[] CreatePayload(long firstElement, long otherElemetns, int sizeInKyloBytes = 21)
     {
         var elementSize = sizeof(long);
         var arraySize = (sizeInKyloBytes * 1024) / elementSize;
