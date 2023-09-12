@@ -53,7 +53,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
         IBroadcastChannelWriter<long[]> channelWriter = _provider.GetChannelWriter<long[]>(channelId);
 
         // Activate consumer grain before publishing
-        await _grainFactory.GetGrain<IConsumerGrain>(Constants.Key).GetStats();
+        await _grainFactory.GetGrain<IConsumerGrain>(Constants.Key).Activate();
         
         long siloId;
         lock (_mutex)

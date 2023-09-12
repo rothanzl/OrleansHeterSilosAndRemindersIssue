@@ -12,7 +12,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     private readonly StartTestRequest _startTestRequest;
     private readonly Stopwatch _loggingSw = new();
 
-    private StatsResponse ChannelsStats { get; set; } = new(new(), new(), new());
+    private StatsResponse ChannelsStats { get; set; } = StatsResponse.Empty;
 
 
     public SelfLoadingScenario(TesterConfig config, ILogger logger, StartTestRequest startTestRequest) : base(config, logger)

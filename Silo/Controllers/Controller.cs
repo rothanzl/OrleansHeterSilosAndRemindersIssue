@@ -52,7 +52,7 @@ public class Controller : ControllerBase
     [HttpGet("broadcast")]
     public async Task<ActionResult<StatsResponse>> GetBroadcastStats()
     {
-        var grain = _grainFactory.GetGrain<IConsumerGrain>(Constants.Key);
+        var grain = _grainFactory.GetGrain<IStatsGrain>(Constants.Key);
         var stats = await grain.GetStats();
         return Ok(stats);
     }
