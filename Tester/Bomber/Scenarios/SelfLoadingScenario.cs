@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Abstractions;
-using Abstractions.BroadcastChannel;
 using NBomber.Contracts;
 using NBomber.CSharp;
 
@@ -11,8 +10,7 @@ public class SelfLoadingScenario : BaseScenarioMethod
     
     private readonly StartTestRequest _startTestRequest;
     private readonly Stopwatch _loggingSw = new();
-
-    private StatsResponse ChannelsStats { get; set; } = StatsResponse.Empty;
+    private readonly Stopwatch _totalSw = new();
 
 
     public SelfLoadingScenario(TesterConfig config, ILogger logger, StartTestRequest startTestRequest) : base(config, logger)
@@ -22,6 +20,9 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
     public override async Task Init()
     {
+        TODO - Before test starts
+            
+        _totalSw.Restart();
         using var httpClient = HttpClientFactory();
         var response = await httpClient.PostAsync($"{_config.TestAppUrl}/test/start", null);
         _logger.LogInformation("Start populate with response {@Code}", response.StatusCode.ToString());
@@ -39,20 +40,16 @@ public class SelfLoadingScenario : BaseScenarioMethod
         using HttpClient httpClient = HttpClientFactory();
         Stopwatch sw = Stopwatch.StartNew();
         var countersResponse = await httpClient.GetAsync($"{_config.TestAppUrl}/counters");
-        var channelsStatsResponse = await httpClient.GetAsync($"{_config.TestAppUrl}/broadcast");
         sw.Stop();
         
         if(!countersResponse.IsSuccessStatusCode)
             return Response.Fail(statusCode: countersResponse.StatusCode.ToString());
         
-        if(!channelsStatsResponse.IsSuccessStatusCode)
-            return Response.Fail(statusCode: channelsStatsResponse.StatusCode.ToString());
+        Do the test loop
 
 
         var counters = await countersResponse.Content.ReadFromJsonAsync<CountersResponse>()
             ?? throw new NullReferenceException("Cannot deserialize CountersResponse");
-        var channelsStats = await channelsStatsResponse.Content.ReadFromJsonAsync<StatsResponse>()
-            ?? throw new NullReferenceException("Cannot deserialize StatsResponse");
         
         int responseLimitMs, expectedSilos;
         bool printLog;
@@ -61,22 +58,14 @@ public class SelfLoadingScenario : BaseScenarioMethod
             expectedSilos = _startTestRequest.ExpectedSilos;
             responseLimitMs = _startTestRequest.ResponseLimitMs;
             printLog = _loggingSw.ElapsedMilliseconds > 2000;
-
-            if(!(channelsStats.InconsistentCounters.Count == 0 && ChannelsStats.InconsistentCounters.Any()))
-            {
-                ChannelsStats = channelsStats;
-            }
             
             if(printLog)
                 _loggingSw.Restart();
         }
         
         if(printLog)
-            _logger.LogInformation("Last latency {@Ms} ms, Channels stats: {@Ch}",
-                sw.ElapsedMilliseconds.ToString(), channelsStats);
-
-        if (channelsStats.InconsistentCounters.Any())
-            return Response.Fail(statusCode: "InconsistentCounters", message: channelsStats.ToString());
+            _logger.LogInformation("Last latency {@Ms} ms",
+                sw.ElapsedMilliseconds.ToString());
 
         if (counters.SystemHosts != expectedSilos)
             return Response.Fail(statusCode: "ErrorExpectedSilos" + counters.SystemHosts.ToString());
@@ -89,12 +78,16 @@ public class SelfLoadingScenario : BaseScenarioMethod
 
     public override void TestEndHook(TimeSpan testDuration)
     {
-        _logger.LogWarning("Test durations {Sw}, channel stats: {Ch}", testDuration, ChannelsStats);
+        Log at the end of the test
+        
+        _logger.LogWarning("Test durations {Sw}", testDuration);
     }
 
 
     public override async ValueTask DisposeAsync()
     {
+        Stop the test
+        
         using var httpClient = HttpClientFactory();
         var response = await httpClient.PostAsync($"{_config.TestAppUrl}/test/stop", null);
         _logger.LogInformation("Stop populate with response {Code}", response.StatusCode.ToString());

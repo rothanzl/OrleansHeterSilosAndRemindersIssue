@@ -36,16 +36,18 @@ public class Controller : ControllerBase
     }
 
     [HttpPost("test/start")]
-    public async Task<ActionResult> StartPopulate()
+    public async Task<ActionResult> StartTest()
     {
-        await ITestConfigGrain.GetInstance(_grainFactory).Start();
+        Start the test
+        
         return Ok();
     }
     
     [HttpPost("test/stop")]
-    public async Task<ActionResult> StopPopulate()
+    public async Task<ActionResult> StopTest()
     {
-        await ITestConfigGrain.GetInstance(_grainFactory).Stop();
+        Stop the test
+        
         return Ok();
     }
 
