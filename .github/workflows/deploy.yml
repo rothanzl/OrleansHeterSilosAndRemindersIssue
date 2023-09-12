@@ -4,6 +4,8 @@ on:
   push:
     branches:
     - deploy
+    - deploy-mr
+    - deploy-th
 
 env:
   
