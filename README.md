@@ -62,16 +62,17 @@ požadavky jsou pozdržen dokud se fronta nezpracuje.
 Při přetečení fronty se producer nedozví, že se zpráva nepovedla doručit.
 
 
-Producer
-98090
-Consumer
-1578
-
-
 #### 2. Test
 
 Produce faster than consume, measure when it failed.
 
+##### Result:
+
+Producer doesn't know, that channel throws messages.
+Only records in logs inform about overloading.
+
+The channel can store up to 20,000 undelivered messages. 
+Often much less only about 15,000.
 
 ## Deploy
 
