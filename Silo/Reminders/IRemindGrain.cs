@@ -2,7 +2,8 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Orleans.Runtime;
 using Silo.TestGrains.States;
-using System.Security.Policy;
+using Abstractions.OrleansCommon;
+using Orleans.Placement;
 
 namespace Silo.Reminders;
 
@@ -11,6 +12,8 @@ public interface IRemindGrain : IGrainWithStringKey
     ValueTask Init();
 }
 
+[DontPlaceMeOnTheDashboard]
+[PreferLocalPlacement]
 public class RemindGrain : Grain, IRemindGrain, IRemindable
 {
     private ShipmentDemoState State { get; set; } = new();
@@ -28,7 +31,7 @@ public class RemindGrain : Grain, IRemindGrain, IRemindable
 
     public async ValueTask Init()
     {
-        Stopwatch sw = Stopwatch.StartNew();
+            Stopwatch sw = Stopwatch.StartNew();
         
         string json = @"{
             'Id': 123456789,
