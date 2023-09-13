@@ -2,6 +2,7 @@
 using Orleans.Placement;
 using Orleans.Runtime;
 using Orleans.Runtime.Placement;
+using OrleansDashboard;
 
 namespace Abstractions.OrleansCommon
 {
@@ -18,12 +19,18 @@ namespace Abstractions.OrleansCommon
             ManagementGrain = GrainFactory.GetGrain<IManagementGrain>(0);
         }
 
+        private const string DashboardSiloName = "dashboard";
+
         public async Task<SiloAddress> OnAddActivation(PlacementStrategy strategy, PlacementTarget target, IPlacementContext context)
         {
             var activeSilos = await ManagementGrain.GetDetailedHosts(onlyActive: true);
             _logger.LogInformation($"Silos[{activeSilos.Length}] wiht names {string.Join(", ", activeSilos.Select(s => s.SiloName))}");
             _logger.LogInformation($"Silos[{activeSilos.Length}] wiht names {string.Join(", ", activeSilos.Select(s => s.RoleName))}");
-            var silos = activeSilos.Where(x => !x.SiloName.ToLower().Contains("dashboard")).Select(x => x.SiloAddress).ToArray();
+            var silos = activeSilos.Where(x => !x.SiloName.ToLower().Contains(DashboardSiloName)).Select(x => x.SiloAddress).ToArray();
+
+            if (silos.FirstOrDefault(s => s.Equals(context.LocalSilo)) is { } localSilo)
+                return localSilo;
+
             return silos[new Random().Next(0, silos.Length)];
         }
     }
