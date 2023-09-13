@@ -11,7 +11,7 @@ public interface IMetricsGrain : IGrainWithIntegerKey
     ValueTask SetValues(double deserializeMs, double reminderMs);
 }
 
-[DontPlaceMeOnTheDashboard]
+[PreferLocalPlacement]
 public class MetricsGrain : Grain, IMetricsGrain
 {
 

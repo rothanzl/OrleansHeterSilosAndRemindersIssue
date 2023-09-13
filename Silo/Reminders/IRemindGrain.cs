@@ -12,7 +12,7 @@ public interface IRemindGrain : IGrainWithStringKey
     ValueTask Init();
 }
 
-[DontPlaceMeOnTheDashboard]
+[PreferLocalPlacement]
 public class RemindGrain : Grain, IRemindGrain, IRemindable
 {
     private ShipmentDemoState State { get; set; } = new();

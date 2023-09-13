@@ -1,4 +1,3 @@
-using Abstractions.OrleansCommon;
 using Orleans.Placement;
 
 namespace Silo.AutoPopulation;
@@ -12,7 +11,7 @@ public interface ITestConfigGrain : IGrainWithIntegerKey
     ValueTask<bool> IsTestEnabled();
 }
 
-[DontPlaceMeOnTheDashboard]
+[PreferLocalPlacement]
 public class TestConfigGrain : ITestConfigGrain
 {
     private bool TestEnabledState { get; set; } = false;

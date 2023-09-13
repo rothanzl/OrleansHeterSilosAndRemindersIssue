@@ -6,7 +6,7 @@ using Silo.AutoPopulation;
 namespace Silo.TestGrains;
 
 
-[DontPlaceMeOnTheDashboard]
+[PreferLocalPlacement]
 public class RecurrentTestGrainInMemory : Grain, IRecurrentTestGrainInMemory
 {
     private long[] State { get; set; }
