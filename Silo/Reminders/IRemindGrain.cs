@@ -13,7 +13,6 @@ public interface IRemindGrain : IGrainWithStringKey
 }
 
 [DontPlaceMeOnTheDashboard]
-[PreferLocalPlacement]
 public class RemindGrain : Grain, IRemindGrain, IRemindable
 {
     private ShipmentDemoState State { get; set; } = new();

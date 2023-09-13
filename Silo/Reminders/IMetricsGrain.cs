@@ -1,4 +1,6 @@
+using Abstractions.OrleansCommon;
 using Abstractions.Reminders;
+using Orleans.Placement;
 
 namespace Silo.Reminders;
 
@@ -9,7 +11,7 @@ public interface IMetricsGrain : IGrainWithIntegerKey
     ValueTask SetValues(double deserializeMs, double reminderMs);
 }
 
-
+[DontPlaceMeOnTheDashboard]
 public class MetricsGrain : Grain, IMetricsGrain
 {
 
