@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Abstractions;
 using Abstractions.OrleansCommon;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;

@@ -1,10 +1,12 @@
 using Abstractions;
+using Abstractions.Reminders;
 using Microsoft.AspNetCore.Mvc;
 using Orleans.Runtime;
 using OrleansDashboard;
 using OrleansDashboard.Metrics.TypeFormatting;
 using OrleansDashboard.Model;
 using Silo.AutoPopulation;
+using Silo.Reminders;
 using Silo.TestGrains;
 
 namespace Silo.Controllers;
@@ -47,7 +49,14 @@ public class Controller : ControllerBase
         return Ok();
     }
 
-    
+
+    [HttpGet("/reminder/metrics")]
+    public async Task<ActionResult<MetricsResponse>> GetReminderMetricsAsync()
+    {
+        var result = await IMetricsGrain.GetInstance(_grainFactory).GetMetrics();
+        return Ok(result);
+    }
+
 
 
     [HttpGet("counters")]

@@ -87,5 +87,7 @@ public class RemindGrain : Grain, IRemindGrain, IRemindable
         
         _logger.LogInformation("Init deserialize {D}ms, reminder {R}ms", 
             msDeserialize.ToString(), msRegisterOrUpdateReminder.ToString());
+
+        await IMetricsGrain.GetInstance(GrainFactory).SetValues(deserializeMs: msDeserialize, reminderMs: msRegisterOrUpdateReminder);
     }
 }
