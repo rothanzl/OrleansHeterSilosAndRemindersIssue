@@ -45,7 +45,6 @@ builder
                 opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
                 
                 opt.ContainerThroughputProperties = ThroughputProperties.CreateManualThroughput(1000);
-                opt.DatabaseThroughput = 2000;
             });
             
             siloBuilder.UseCosmosReminderService((CosmosReminderTableOptions opt) =>
@@ -59,7 +58,6 @@ builder
                     
                     opt.CleanResourcesOnInitialization = true;
                     opt.ContainerThroughputProperties = ThroughputProperties.CreateManualThroughput(1000);
-                    opt.DatabaseThroughput = 2000;
                 });
             
             siloBuilder.AddCosmosGrainStorageAsDefault((CosmosGrainStorageOptions opt) =>

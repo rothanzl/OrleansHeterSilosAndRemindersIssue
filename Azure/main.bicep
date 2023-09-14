@@ -93,21 +93,21 @@ module silo 'silo.bicep' = {
   }
 }
 
-module dashboard 'dashboard.bicep' = {
-  name: 'dashboard'
-  params: {
-    location: location
-    name: 'dashboard'
-    containerAppEnvironmentId: env.outputs.id
-    registry: acr.name
-    registryPassword: acr.listCredentials().passwords[0].value
-    registryUsername: acr.listCredentials().username
-    allowExternalIngress: true
-    targetIngressPort: 80
-    maxReplicas: 1
-    envVars : shared_config
-  }
-}
+// module dashboard 'dashboard.bicep' = {
+//   name: 'dashboard'
+//   params: {
+//     location: location
+//     name: 'dashboard'
+//     containerAppEnvironmentId: env.outputs.id
+//     registry: acr.name
+//     registryPassword: acr.listCredentials().passwords[0].value
+//     registryUsername: acr.listCredentials().username
+//     allowExternalIngress: true
+//     targetIngressPort: 80
+//     maxReplicas: 1
+//     envVars : shared_config
+//   }
+// }
 
 var tester_config = union(shared_config, 
   [
@@ -115,10 +115,10 @@ var tester_config = union(shared_config,
       name: 'TestAppUrl'
       value: silo.outputs.url
     }
-    {
-      name: 'DashboardUrl'
-      value: dashboard.outputs.url
-    }
+    // {
+    //   name: 'DashboardUrl'
+    //   value: dashboard.outputs.url
+    // }
   ])
 
 module tester 'tester.bicep' = {
