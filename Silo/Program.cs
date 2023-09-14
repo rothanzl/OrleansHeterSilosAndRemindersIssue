@@ -21,7 +21,7 @@ builder
         siloBuilder
             .Configure<ClusterOptions>(options =>
             {
-                options.ClusterId = "Cluster";
+                options.ClusterId = "Cluster2";
                 options.ServiceId = "Service";
             })
             .Configure<SiloOptions>(options =>
@@ -51,10 +51,6 @@ builder
                     opt.DatabaseName = CosmosDbConfig.CosmosOrleansDbName;
                     opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
                     opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
-                    
-                    
-                    
-                    opt.CleanResourcesOnInitialization = true;
                 });
             
             siloBuilder.AddCosmosGrainStorageAsDefault((CosmosGrainStorageOptions opt) =>
