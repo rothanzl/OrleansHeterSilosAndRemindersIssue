@@ -1,3 +1,4 @@
+using Abstractions;
 using Silo.Reminders;
 
 namespace Silo.AutoPopulation;
@@ -79,7 +80,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
                     {
                         PopulationCycleNumber += 1;
                     }
-                    
+
                     await _grainFactory.GetGrain<IRemindGrain>($"{siloId}-{counter}").Init();
                 }
                 

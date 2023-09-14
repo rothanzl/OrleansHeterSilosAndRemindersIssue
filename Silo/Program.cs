@@ -43,6 +43,9 @@ builder
                 opt.DatabaseName = CosmosDbConfig.CosmosOrleansDbName;
                 opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
                 opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
+                
+                opt.ContainerThroughputProperties = ThroughputProperties.CreateManualThroughput(1000);
+                opt.DatabaseThroughput = 2000;
             });
             
             siloBuilder.UseCosmosReminderService((CosmosReminderTableOptions opt) =>
@@ -51,6 +54,12 @@ builder
                     opt.DatabaseName = CosmosDbConfig.CosmosOrleansDbName;
                     opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
                     opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
+                    
+                    
+                    
+                    opt.CleanResourcesOnInitialization = true;
+                    opt.ContainerThroughputProperties = ThroughputProperties.CreateManualThroughput(1000);
+                    opt.DatabaseThroughput = 2000;
                 });
             
             siloBuilder.AddCosmosGrainStorageAsDefault((CosmosGrainStorageOptions opt) =>
@@ -77,7 +86,7 @@ builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddWebAppApplicationInsights("Silo");
 
 // uncomment this if you dont mind hosting grains in the dashboard
-// builder.Services.DontHostGrainsHere();
+builder.Services.DontHostGrainsHere();
 
 var app = builder.Build();
 app.MapControllers();

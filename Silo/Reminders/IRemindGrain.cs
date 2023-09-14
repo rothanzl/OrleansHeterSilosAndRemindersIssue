@@ -12,7 +12,7 @@ public interface IRemindGrain : IGrainWithStringKey
     ValueTask Init();
 }
 
-[PreferLocalPlacement]
+[DontPlaceMeOnTheDashboard]
 public class RemindGrain : Grain, IRemindGrain, IRemindable
 {
     private ShipmentDemoState State { get; set; } = new();
@@ -78,6 +78,7 @@ public class RemindGrain : Grain, IRemindGrain, IRemindable
         }";
 
         State = JsonConvert.DeserializeObject<ShipmentDemoState>(json)!;
+        // The state has 440 bytes
         var msDeserialize = sw.ElapsedMilliseconds;
         sw.Restart();
         
