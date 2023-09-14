@@ -43,8 +43,6 @@ builder
                 opt.DatabaseName = CosmosDbConfig.CosmosOrleansDbName;
                 opt.ClientOptions = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Direct };
                 opt.ConfigureCosmosClient(accountEndpoint: cosmosDbUri, authKeyOrResourceToken: cosmosDbKey);
-                
-                opt.ContainerThroughputProperties = ThroughputProperties.CreateManualThroughput(1000);
             });
             
             siloBuilder.UseCosmosReminderService((CosmosReminderTableOptions opt) =>
@@ -57,7 +55,6 @@ builder
                     
                     
                     opt.CleanResourcesOnInitialization = true;
-                    opt.ContainerThroughputProperties = ThroughputProperties.CreateManualThroughput(1000);
                 });
             
             siloBuilder.AddCosmosGrainStorageAsDefault((CosmosGrainStorageOptions opt) =>
