@@ -5,7 +5,9 @@
       "launchBrowser": true,
       "launchUrl": "http://localhost:8080",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CosmosDbKey": "sXdLprtQTRMkNQaGP7ntJ1uqZsgYpJRxskjaP4mQtAPj1kK9z9NQQ6zghW4CEa9Qq7e7vTq59qyrACDb136Tvw==",
+        "CosmosDbUri": "https://sql-4o2tmix6nico4.documents.azure.com:443/"
       },
       "applicationUrl": "http://localhost:5001",
       "dotnetRunMessages": true

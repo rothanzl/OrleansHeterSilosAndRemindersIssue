@@ -3,7 +3,9 @@
     "HelloOrleans.Silo": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CosmosDbKey": "sXdLprtQTRMkNQaGP7ntJ1uqZsgYpJRxskjaP4mQtAPj1kK9z9NQQ6zghW4CEa9Qq7e7vTq59qyrACDb136Tvw==",
+        "CosmosDbUri": "https://sql-4o2tmix6nico4.documents.azure.com:443/"
       },
       "applicationUrl": "https://localhost:5000",
       "dotnetRunMessages": true

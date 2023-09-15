@@ -34,7 +34,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
 
         int parallelism;
         if (!Int32.TryParse(Environment.GetEnvironmentVariable("POPULATE_PARALLELISM")??"", out parallelism))
-            parallelism = 10;
+            parallelism = 1;
 
         
         if (!Int32.TryParse(Environment.GetEnvironmentVariable("POPULATE_LIMIT")??"", out _populationLimit))

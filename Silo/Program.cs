@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Abstractions;
 using Abstractions.OrleansCommon;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -10,7 +9,6 @@ using Orleans.Persistence.Cosmos;
 using Orleans.Reminders.Cosmos;
 using Silo;
 using Silo.AutoPopulation;
-using Silo.Reminders.HealthCheck;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,7 +39,6 @@ builder
             .ConfigureServices(services =>
             {
                 services.AddHostedService<PopulationService>();
-                services.AddHostedService<RemindersHealthCheckHostedService>();
             })
             ;
 
@@ -84,10 +81,7 @@ builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddWebAppApplicationInsights("Silo");
 
-// uncomment this if you dont mind hosting grains in the dashboard
-builder.Services.DontHostGrainsHere();
 
 var app = builder.Build();
 app.MapControllers();
@@ -120,6 +114,12 @@ app.MapHealthChecks("/health", new HealthCheckOptions()
 });
 
 
-// app.MapGet("/", () => Results.Ok("Silo"));
+await app.StartAsync();
 
-app.Run();
+
+
+var gf = app.Services.GetRequiredService<IGrainFactory>();
+await ITestConfigGrain.GetInstance(gf).Start();
+
+
+await app.WaitForShutdownAsync();
