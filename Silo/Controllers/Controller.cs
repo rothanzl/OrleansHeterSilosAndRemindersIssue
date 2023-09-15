@@ -103,7 +103,7 @@ public class Controller : ControllerBase
             SimpleGrainStats = simpleGrainStatsCounters,
             Hosts = hosts,
             ActivatedTestGrainCount = simpleGrainStatsCounters
-                .Where(g=> g.GrainType.Equals(typeof(RecurrentTestGrainInMemory).FullName))
+                .Where(g=> g.GrainType.Equals(typeof(RemindGrain).FullName))
                 .Sum(g=>g.ActivationCount),
             SystemHosts = hosts
                 .Count(h => h.SiloName.Equals(ClusterConfig.SiloName))

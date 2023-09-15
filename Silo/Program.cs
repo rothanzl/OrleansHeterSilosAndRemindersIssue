@@ -8,21 +8,30 @@ using Orleans.Clustering.Cosmos;
 using Orleans.Configuration;
 using Orleans.Persistence.Cosmos;
 using Orleans.Reminders.Cosmos;
+using Silo;
 using Silo.AutoPopulation;
+using Silo.Reminders.HealthCheck;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+var cosmosDbKey = builder.Configuration.GetValue<string>("CosmosDbKey");
+var cosmosDbUri = builder.Configuration.GetValue<string>("CosmosDbUri");
+
+if (cosmosDbKey is { } && cosmosDbUri is { })
+{
+    CosmosDbApi dbApi = new(endpoint: cosmosDbUri, key: cosmosDbKey);
+    // await dbApi.ClearContainer(dbId: CosmosDbConfig.CosmosOrleansDbName, containerId: "OrleansReminders", autoscale: true, throughput: 5_000);
+}
+
 builder
     .Host.UseOrleans((ctx, siloBuilder) => 
     {
-        var cosmosDbKey = ctx.Configuration.GetValue<string>("CosmosDbKey");
-        var cosmosDbUri = ctx.Configuration.GetValue<string>("CosmosDbUri");
-        
         siloBuilder
             .Configure<ClusterOptions>(options =>
             {
-                options.ClusterId = "Cluster2";
-                options.ServiceId = "Service";
+                options.ClusterId = ClusterConfig.ClusterId;
+                options.ServiceId = ClusterConfig.ServiceId;
             })
             .Configure<SiloOptions>(options =>
             {
@@ -32,6 +41,7 @@ builder
             .ConfigureServices(services =>
             {
                 services.AddHostedService<PopulationService>();
+                services.AddHostedService<RemindersHealthCheckHostedService>();
             })
             ;
 

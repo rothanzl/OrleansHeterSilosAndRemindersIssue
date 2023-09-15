@@ -11,6 +11,7 @@ Each test is assigned by number and has own branch
 
 1. `test/01-max-grains` - Max limit grains in silo tests
 2. `test/02-stream-broadcast` - Orleans broadcast channels tests
+3. `test/03-reminders` - Orleans reminders limit tests
 
 ### Max limit grains in silo tests
 
@@ -73,6 +74,12 @@ Only records in logs inform about overloading.
 
 The channel can store up to 20,000 undelivered messages. 
 Often much less only about 15,000.
+
+
+### Orleans reminders limit tests
+
+TBD
+
 
 ## Deploy
 

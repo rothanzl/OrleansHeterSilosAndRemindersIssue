@@ -92,7 +92,7 @@ public class PopulationService : BackgroundService, IAsyncDisposable
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Population loop error");
-                await Task.Delay(1000);
+                await Task.Delay(10000);
             }
         }
     }

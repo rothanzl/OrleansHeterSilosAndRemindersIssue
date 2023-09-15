@@ -1,3 +1,4 @@
+using Abstractions;
 using Abstractions.OrleansCommon;
 using Microsoft.Azure.Cosmos;
 using Orleans.Clustering.Cosmos;
@@ -16,8 +17,8 @@ builder.Host.UseOrleans((ctx, siloBuilder) =>
     siloBuilder
         .Configure<ClusterOptions>(options =>
         {
-            options.ClusterId = "Cluster";
-            options.ServiceId = "Service";
+            options.ClusterId = ClusterConfig.ClusterId;
+            options.ServiceId = ClusterConfig.ServiceId;
         })
         .Configure<SiloOptions>(options =>
         {
